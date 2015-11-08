@@ -22,11 +22,18 @@ public class DatabaseGui extends JFrame
    private JRadioButton   genreButton;
    private JRadioButton   awardButton;
    private JRadioButton   platformButton;
+   private JRadioButton   gamesButton;
+   private JRadioButton   moviesButton;
+
+   private ButtonGroup  gamesOrMoviesButtonGroup;
+   private ButtonGroup  moviesSelectionButtonGroup;
+   private ButtonGroup  gamesSelectionButtonGroup;
 
    private JPanel         topPanel;
    private JPanel         loginPanel;
    private JPanel         queryPanel;
    private JPanel         radioButtonPanel;
+   private JPanel         gamesOrMoviesPanel;
 
    private JTable         table;
    private JScrollPane    scroller;
@@ -52,6 +59,16 @@ public class DatabaseGui extends JFrame
       genreButton    = new JRadioButton("genre");
       awardButton    = new JRadioButton("award");
       platformButton = new JRadioButton("platform");
+      gamesButton    = new JRadioButton("games");
+      moviesButton   = new JRadioButton("movies");
+
+      gamesOrMoviesButtonGroup   = new ButtonGroup();
+
+      castButton.setEnabled(true);
+      directorButton.setEnabled(true);
+      awardButton.setEnabled(true);
+      platformButton.setEnabled(false);
+
       
       loginButton    = new JButton("Login");
       loginPanel.setLayout(new GridLayout(2,2,0,5));
@@ -66,20 +83,34 @@ public class DatabaseGui extends JFrame
       loginButton.setActionCommand("LOGIN");
       loginButton.addActionListener(this);
 
-      radioButtonPanel = new JPanel();
+      radioButtonPanel   = new JPanel();
+      gamesOrMoviesPanel = new JPanel();
+
       radioButtonPanel.add(castButton);
       radioButtonPanel.add(directorButton);
       radioButtonPanel.add(genreButton);
       radioButtonPanel.add(platformButton);
       radioButtonPanel.add(awardButton);
-      radioButtonPanel.setBorder(BorderFactory.createTitledBorder("Options"));
+      radioButtonPanel.setBorder(BorderFactory.createTitledBorder("Selection Options"));
 
+      gamesOrMoviesButtonGroup.add(moviesButton);
+      gamesOrMoviesButtonGroup.add(gamesButton);
+      gamesOrMoviesPanel.add(gamesButton);
+      gamesOrMoviesPanel.add(moviesButton);
+      gamesOrMoviesPanel.setBorder(BorderFactory.createTitledBorder("Rental Options"));
+      radioButtonPanel.add(gamesOrMoviesPanel);
+
+      moviesButton.setActionCommand("MOVIES");
+      gamesButton.setActionCommand("GAMES");
+      moviesButton.addActionListener(this);
+      gamesButton.addActionListener(this);
 
       queryPanel   = new JPanel();
       searchField  = new JTextField(30);
       searchButton = new JButton("Submit");
 
       searchButton.setActionCommand("SEARCH");
+      searchButton.addActionListener(this);
       searchButton.setEnabled(false);
       searchField.setEnabled(false);
       queryPanel.setLayout(new BorderLayout());
@@ -119,7 +150,11 @@ public void actionPerformed(ActionEvent e)
    ResultSetMetaData metaData;
    PreparedStatement pstmt;
 
-   if(e.getActionCommand().equals("LOGIN"))
+   if((e.getActionCommand().equals("MOVIES"))||(e.getActionCommand().equals("GAMES")))
+   {
+        buttonUpdater();
+   }
+   else if(e.getActionCommand().equals("LOGIN"))
    {
       String id     = idField.getText();
       char[] p      = pwdField.getPassword();
@@ -153,7 +188,7 @@ public void actionPerformed(ActionEvent e)
             searchButton.setEnabled(true);
             searchField.setEnabled(true);
             getRootPane().setDefaultButton(searchButton);
-         }//END of else
+         }//END of else 
       }// end of try
       catch(ClassNotFoundException ex) 
       {
@@ -175,6 +210,26 @@ public void actionPerformed(ActionEvent e)
       {
           query = dbHandler.acquireResults + dbHandler.directorSearch + ')';
           doQuery(query,queryInsert);
+      }
+      else if(castButton.isSelected())
+      {
+          query = dbHandler.acquireResults + dbHandler.castSearch + ')';
+          doQuery(query,queryInsert);
+      }
+      else if(genreButton.isSelected())
+      {
+          query = dbHandler.acquireResults + dbHandler.movieGenreSearch + ')';
+          doQuery(query,queryInsert);
+      }
+      else if(platformButton.isSelected())
+      {
+          query = dbHandler.acquireResults + dbHandler.platformSearch + ')';
+          doQuery(query,queryInsert);
+      }
+      else if(awardButton.isSelected())
+      {
+          query = dbHandler.acquireResults + dbHandler.awardWinnerSearch + ')';
+          doQuery(query,"");
       }
    }//END OF SEARCH ELSE
 }//END OF ACTION PERFORMED
@@ -237,11 +292,30 @@ void doQuery(String querytodo,String searchFieldText)
    JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
   }
 }// END OF DO QUERY 
-            
-        
-      
-       
-   
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////            
+void buttonUpdater()
+{
+    castButton.setSelected(false);
+    directorButton.setSelected(false);
+    awardButton.setSelected(false);
+    platformButton.setSelected(false);
+    genreButton.setSelected(false);
+    System.out.println("Buttons are being updated.");
+    if(moviesButton.isSelected())
+    {
+      castButton.setEnabled(true);
+      directorButton.setEnabled(true);
+      awardButton.setEnabled(true);
+      platformButton.setEnabled(false);
+    }
+    else if (gamesButton.isSelected())
+    {
+      castButton.setEnabled(false);
+      directorButton.setEnabled(false);
+      awardButton.setEnabled(false);
+      platformButton.setEnabled(true);   
+    }
+}        
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // inner class for handling window event
 private class WindowHandler extends WindowAdapter
