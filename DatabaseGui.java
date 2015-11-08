@@ -22,6 +22,7 @@ public class DatabaseGui extends JFrame
    private JRadioButton   awardButton;
    private JRadioButton   platformButton;
 
+   private JPanel         topPanel;
    private JPanel         loginPanel;
    private JPanel         queryPanel;
    private JPanel         radioButtonPanel;
@@ -29,12 +30,13 @@ public class DatabaseGui extends JFrame
    private JTable         table;
    private JScrollPane    scroller;
 
-   private Connection connection;
+   private Connection     connection;
 
+   Vector<Object>         userData;
    public DatabaseGui()
    {
-      setLayout(new FlowLayout());
-
+      setLayout(new FlowLayout(FlowLayout.CENTER));
+      topPanel       = new JPanel();
       loginPanel     = new JPanel();
       idLabel        = new JLabel("User Id");
       pwdLabel       = new JLabel("Password");
@@ -52,30 +54,35 @@ public class DatabaseGui extends JFrame
       loginPanel.add(idField);
       loginPanel.add(pwdLabel);
       loginPanel.add(pwdField);
-      add(loginPanel);
-      add(loginButton);
+      topPanel.add(loginPanel);
+      topPanel.add(loginButton);
+      add(topPanel,BorderLayout.NORTH);
       getRootPane().setDefaultButton(loginButton);
       loginButton.setActionCommand("LOGIN");
       loginButton.addActionListener(this);
 
-      queryPanel   = new JPanel();
-      searchField  = new JTextField(30);
-      searchButton = new JButton("Submit");
-      searchButton.setActionCommand("SEARCH");
-      searchButton.setEnabled(false);
-      searchField.setEnabled(false);
-      queryPanel.setLayout(new BoxLayout(queryPanel,BoxLayout.X_AXIS));
-      queryPanel.setBorder(BorderFactory.createTitledBorder("Search"));
-      queryPanel.add(searchField);
-      queryPanel.add(searchButton);
-
-      add(queryPanel);
       radioButtonPanel = new JPanel();
       radioButtonPanel.add(castButton);
       radioButtonPanel.add(genreButton);
       radioButtonPanel.add(platformButton);
       radioButtonPanel.add(awardButton);
-      add(radioButtonPanel);
+      radioButtonPanel.setBorder(BorderFactory.createTitledBorder("Options"));
+
+
+      queryPanel   = new JPanel();
+      searchField  = new JTextField(30);
+      searchButton = new JButton("Submit");
+
+      searchButton.setActionCommand("SEARCH");
+      searchButton.setEnabled(false);
+      searchField.setEnabled(false);
+      queryPanel.setLayout(new BorderLayout());
+      queryPanel.setBorder(BorderFactory.createTitledBorder("Search"));
+      queryPanel.add(searchField,BorderLayout.CENTER);
+      queryPanel.add(searchButton,BorderLayout.EAST);
+      queryPanel.add(radioButtonPanel,BorderLayout.SOUTH);
+      add(queryPanel,BorderLayout.CENTER);
+
 
       this.setupMainFrame();
 
@@ -99,6 +106,10 @@ public class DatabaseGui extends JFrame
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 public void actionPerformed(ActionEvent e)
 {
+   Statement         statement;
+   ResultSet         resultSet;
+   ResultSetMetaData metaData;
+
    if(e.getActionCommand().equals("LOGIN"))
    {
       String id     = idField.getText();
@@ -109,14 +120,38 @@ public void actionPerformed(ActionEvent e)
       {
          Class.forName( "com.mysql.jdbc.Driver" );
          connection = DriverManager.getConnection(url, "root", "141305" );
-         loginButton.setEnabled(false);
-         idLabel.setEnabled(false);
-         pwdLabel.setEnabled(false);
-         idField.setEnabled(false);
-         pwdField.setEnabled(false);
-         searchButton.setEnabled(true);
-         searchField.setEnabled(true);
-         getRootPane().setDefaultButton(searchButton);
+         statement = connection.createStatement();
+         resultSet = statement.executeQuery("Select * From User u where u.email = '" + id + "' AND user_password = '" + pwd+"';");
+
+         if(!resultSet.next()) 
+         {
+            JOptionPane.showMessageDialog(null,"No records found!");
+            return;
+         }
+         else
+         {
+            userData = new Vector<Object>();
+            metaData = resultSet.getMetaData();
+            for(int i = 1; i <= metaData.getColumnCount(); ++i)
+            {
+               userData.addElement(resultSet.getObject(i));
+               System.out.println(metaData.getColumnName(i)+": "+resultSet.getObject(i));
+            }
+
+            if(userData.elementAt(2).toString().equals("1"))
+            {
+               System.out.println("SOMEONE PLEASE TURN ON THE ADMIN FEATURES!!");
+            }
+
+            loginButton.setEnabled(false);
+            idLabel.setEnabled(false);
+            pwdLabel.setEnabled(false);
+            idField.setEnabled(false);
+            pwdField.setEnabled(false);
+            searchButton.setEnabled(true);
+            searchField.setEnabled(true);
+            getRootPane().setDefaultButton(searchButton);
+         }
       }
       catch(ClassNotFoundException ex) 
       {
@@ -132,8 +167,6 @@ public void actionPerformed(ActionEvent e)
    else if(e.getActionCommand().equals("SEARCH"))
    {
       String query = searchField.getText();
-      Statement statement;
-      ResultSet resultSet;
       try 
       {
          statement = connection.createStatement();
@@ -152,7 +185,7 @@ public void actionPerformed(ActionEvent e)
             // values representing a certain row of the query result
             Vector<Object> rows = new Vector<Object>();
             // get column headers
-            ResultSetMetaData metaData = resultSet.getMetaData();
+            metaData = resultSet.getMetaData();
             for(int i = 1; i <= metaData.getColumnCount(); ++i)
                columnNames.addElement(metaData.getColumnName(i));
             // get row data
@@ -164,14 +197,15 @@ public void actionPerformed(ActionEvent e)
                rows.addElement(currentRow);
             } 
             while(resultSet.next()); //moves cursor to next record
+            
             if(scroller!=null)
-            getContentPane().remove(scroller);
+               getContentPane().remove(scroller);
+
             // display table with ResultSet contents
             table = new JTable(rows, columnNames);
             table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), 10*table.getRowHeight()));
-            //table.doLayout();
             scroller = new JScrollPane(table);
-            getContentPane().add(scroller);
+            add(scroller,BorderLayout.SOUTH);
             validate();
          }
          statement.close();
