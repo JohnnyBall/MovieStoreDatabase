@@ -18,6 +18,7 @@ public class DatabaseGui extends JFrame
    private JButton        searchButton;
 
    private JRadioButton   castButton;
+   private JRadioButton   directorButton;
    private JRadioButton   genreButton;
    private JRadioButton   awardButton;
    private JRadioButton   platformButton;
@@ -32,6 +33,8 @@ public class DatabaseGui extends JFrame
 
    private Connection     connection;
    private AdminDialog    adminDialog;
+   
+   private DBHandler      dbHandler;
 
    Vector<Object>         userData;
    public DatabaseGui()
@@ -45,6 +48,7 @@ public class DatabaseGui extends JFrame
       pwdField       = new JPasswordField(10);
       
       castButton     = new JRadioButton("cast");
+      directorButton = new JRadioButton("director");
       genreButton    = new JRadioButton("genre");
       awardButton    = new JRadioButton("award");
       platformButton = new JRadioButton("platform");
@@ -64,6 +68,7 @@ public class DatabaseGui extends JFrame
 
       radioButtonPanel = new JPanel();
       radioButtonPanel.add(castButton);
+      radioButtonPanel.add(directorButton);
       radioButtonPanel.add(genreButton);
       radioButtonPanel.add(platformButton);
       radioButtonPanel.add(awardButton);
@@ -83,6 +88,8 @@ public class DatabaseGui extends JFrame
       queryPanel.add(searchButton,BorderLayout.EAST);
       queryPanel.add(radioButtonPanel,BorderLayout.SOUTH);
       add(queryPanel,BorderLayout.CENTER);
+      
+      dbHandler = new DBHandler();
 
 
       this.setupMainFrame();
@@ -110,17 +117,17 @@ public void actionPerformed(ActionEvent e)
    Statement         statement;
    ResultSet         resultSet;
    ResultSetMetaData metaData;
+   PreparedStatement pstmt;
 
    if(e.getActionCommand().equals("LOGIN"))
    {
       String id     = idField.getText();
       char[] p      = pwdField.getPassword();
       String pwd    = new String(p);
-      String url    = "jdbc:mysql://localhost:3306/moviestore";
       try 
       {
-         Class.forName( "com.mysql.jdbc.Driver" );
-         connection = DriverManager.getConnection(url, "root", "141305" );
+         
+         connection = dbHandler.establishConnection();
          statement = connection.createStatement();
          resultSet = statement.executeQuery("Select * From User u where u.email = '" + id + "' AND user_password = '" + pwd+"';");
 
@@ -165,15 +172,33 @@ public void actionPerformed(ActionEvent e)
          JOptionPane.showMessageDialog(null, "Access denied!");
          return;
       }
+      
    }//END IF LOGIN IF
    else if(e.getActionCommand().equals("SEARCH"))
    {
-      String query = searchField.getText();
-      try 
+      
+      String query;
+      String queryInsert = searchField.getText();
+      try
       {
-         statement = connection.createStatement();
-         resultSet = statement.executeQuery(query);
-         //If there are no records, display a message
+        if(directorButton.isSelected())
+        {
+            query = dbHandler.acquireResults + dbHandler.directorSearch + ')';
+            System.out.println(query);
+            pstmt = connection.prepareStatement(query);
+            pstmt.clearParameters();
+            pstmt.setString(1, queryInsert);
+            resultSet = pstmt.executeQuery();
+            System.out.println("About to Execute");
+            
+        
+      
+       
+      
+         //statement = connection.createStatement();
+         //resultSet = statement.executeQuery(query);
+         //resultSet = pstmt.executeQuery();
+         //If there are no records, display a message*/
          if(!resultSet.next()) 
          {
             JOptionPane.showMessageDialog(null,"No records found!");
@@ -210,12 +235,14 @@ public void actionPerformed(ActionEvent e)
             add(scroller,BorderLayout.SOUTH);
             validate();
          }
-         statement.close();
+         pstmt.close();
+        }
       }
       catch(SQLException ex) 
       {
        JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
       }
+      
    }//END OF SEARCH ELSE
 }//END OF ACTION PERFORMED        
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
