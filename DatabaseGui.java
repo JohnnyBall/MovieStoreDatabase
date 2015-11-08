@@ -104,8 +104,8 @@ public class DatabaseGui extends JFrame
   {
     Toolkit   tk = Toolkit.getDefaultToolkit();
     Dimension d  = tk.getScreenSize();
-    this.setSize(400, 500);
-    this.setMinimumSize(new Dimension(500, 500));
+    this.setSize(500, 500);
+    this.setMinimumSize(new Dimension(400, 500));
     this.setLocation(d.width/4, d.height/4);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setTitle("MOVIE'S R US");
@@ -126,11 +126,9 @@ public void actionPerformed(ActionEvent e)
       String pwd    = new String(p);
       try 
       {
-         
          connection = dbHandler.establishConnection();
          statement = connection.createStatement();
          resultSet = statement.executeQuery("Select * From User u where u.email = '" + id + "' AND user_password = '" + pwd+"';");
-
          if(!resultSet.next()) 
          {
             JOptionPane.showMessageDialog(null,"No records found!");
@@ -145,13 +143,8 @@ public void actionPerformed(ActionEvent e)
                userData.addElement(resultSet.getObject(i));
                System.out.println(metaData.getColumnName(i)+": "+resultSet.getObject(i));
             }
-
             if(userData.elementAt(2).toString().equals("1"))
-            {
-               System.out.println("SOMEONE PLEASE TURN ON THE ADMIN FEATURES!!");
                adminDialog = new AdminDialog(connection);
-            }
-
             loginButton.setEnabled(false);
             idLabel.setEnabled(false);
             pwdLabel.setEnabled(false);
@@ -160,8 +153,8 @@ public void actionPerformed(ActionEvent e)
             searchButton.setEnabled(true);
             searchField.setEnabled(true);
             getRootPane().setDefaultButton(searchButton);
-         }
-      }
+         }//END of else
+      }// end of try
       catch(ClassNotFoundException ex) 
       {
          JOptionPane.showMessageDialog(null, "Failed to load JDBC driver!");
@@ -172,79 +165,83 @@ public void actionPerformed(ActionEvent e)
          JOptionPane.showMessageDialog(null, "Access denied!");
          return;
       }
-      
    }//END IF LOGIN IF
    else if(e.getActionCommand().equals("SEARCH"))
    {
       
       String query;
       String queryInsert = searchField.getText();
-      try
+      if(directorButton.isSelected())
       {
-        if(directorButton.isSelected())
-        {
-            query = dbHandler.acquireResults + dbHandler.directorSearch + ')';
-            System.out.println(query);
-            pstmt = connection.prepareStatement(query);
-            pstmt.clearParameters();
-            pstmt.setString(1, queryInsert);
-            resultSet = pstmt.executeQuery();
-            System.out.println("About to Execute");
+          query = dbHandler.acquireResults + dbHandler.directorSearch + ')';
+          doQuery(query,queryInsert);
+      }
+   }//END OF SEARCH ELSE
+}//END OF ACTION PERFORMED
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void doQuery(String querytodo,String searchFieldText)
+{
+   ResultSet         doQueryresultSet;
+   ResultSetMetaData doQuerymetaData;
+   PreparedStatement pstmt;
+  try 
+  {
+    pstmt            = connection.prepareStatement(querytodo);
+    System.out.println("querytodo: "+ querytodo);
+    System.out.println("searchFieldText: "+searchFieldText);
+    pstmt.clearParameters();
+    pstmt.setString(1, searchFieldText);
+    doQueryresultSet = pstmt.executeQuery();
+    System.out.println("About to Execute");
+    //If there are no records, display a message
+    if(!doQueryresultSet.next()) 
+    {
+      JOptionPane.showMessageDialog(null,"No records found!");
+      return;
+    }
+    else 
+    {
+      // columnNames holds the column names of the query result      
+      Vector<Object> columnNames = new Vector<Object>(); 
+      // rows is a vector of vectors, each vector is a vector of
+      // values representing a certain row of the query result
+      Vector<Object> rows = new Vector<Object>();
+      // get column headers
+      doQuerymetaData = doQueryresultSet.getMetaData();
+      for(int i = 1; i <= doQuerymetaData.getColumnCount(); ++i)
+         columnNames.addElement(doQuerymetaData.getColumnName(i));
+      // get row data
+      do 
+      {
+         Vector<Object> currentRow = new Vector<Object>();
+         for(int i = 1; i <= doQuerymetaData.getColumnCount(); ++i)
+            currentRow.addElement(doQueryresultSet.getObject(i));
+         rows.addElement(currentRow);
+      } 
+      while(doQueryresultSet.next()); //moves cursor to next record
+            
+      if(scroller!=null)
+         getContentPane().remove(scroller);
+
+      // display table with ResultSet contents
+      table = new JTable(rows, columnNames);
+      table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), 10*table.getRowHeight()));
+      scroller = new JScrollPane(table);
+      getContentPane().add(scroller,BorderLayout.SOUTH);
+      validate();
+    }
+    pstmt.close();
+  }//end of try
+  catch(SQLException ex) 
+  {
+   JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
+  }
+}// END OF DO QUERY 
             
         
       
        
-      
-         //statement = connection.createStatement();
-         //resultSet = statement.executeQuery(query);
-         //resultSet = pstmt.executeQuery();
-         //If there are no records, display a message*/
-         if(!resultSet.next()) 
-         {
-            JOptionPane.showMessageDialog(null,"No records found!");
-            return;
-         }
-         else 
-         {
-            // columnNames holds the column names of the query result      
-            Vector<Object> columnNames = new Vector<Object>(); 
-            // rows is a vector of vectors, each vector is a vector of
-            // values representing a certain row of the query result
-            Vector<Object> rows = new Vector<Object>();
-            // get column headers
-            metaData = resultSet.getMetaData();
-            for(int i = 1; i <= metaData.getColumnCount(); ++i)
-               columnNames.addElement(metaData.getColumnName(i));
-            // get row data
-            do 
-            {
-               Vector<Object> currentRow = new Vector<Object>();
-               for(int i = 1; i <= metaData.getColumnCount(); ++i)
-                  currentRow.addElement(resultSet.getObject(i));
-               rows.addElement(currentRow);
-            } 
-            while(resultSet.next()); //moves cursor to next record
-            
-            if(scroller!=null)
-               getContentPane().remove(scroller);
-
-            // display table with ResultSet contents
-            table = new JTable(rows, columnNames);
-            table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), 10*table.getRowHeight()));
-            scroller = new JScrollPane(table);
-            add(scroller,BorderLayout.SOUTH);
-            validate();
-         }
-         pstmt.close();
-        }
-      }
-      catch(SQLException ex) 
-      {
-       JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
-      }
-      
-   }//END OF SEARCH ELSE
-}//END OF ACTION PERFORMED        
+   
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // inner class for handling window event
 private class WindowHandler extends WindowAdapter

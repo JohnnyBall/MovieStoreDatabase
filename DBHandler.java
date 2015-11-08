@@ -5,7 +5,7 @@ public class DBHandler
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     static final String DATABASE_URL = "jdbc:mysql://localhost:3306/moviestore";
     static final String USER = "root";
-    static final String PASS = "Prog1";  //Adust this according to local host login
+    static final String PASS = "prog1";  //Adust this according to local host login
     
     public final String acquireResults;
     public final String directorSearch;
@@ -26,7 +26,7 @@ public class DBHandler
         
         acquireResults = "SELECT DISTINCT ar.title, ar.rid " +
                          "FROM rentals ar " +
-                         "WHERE ar.rid IN(";
+                         "WHERE ar.rid IN (";
         
         directorSearch = "SELECT DISTINCT r.rid " +
                          "FROM rentals r, person p, director d, movie m " +
