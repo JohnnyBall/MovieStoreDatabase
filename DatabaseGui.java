@@ -31,6 +31,7 @@ public class DatabaseGui extends JFrame
    private JScrollPane    scroller;
 
    private Connection     connection;
+   private AdminDialog    adminDialog;
 
    Vector<Object>         userData;
    public DatabaseGui()
@@ -91,7 +92,7 @@ public class DatabaseGui extends JFrame
       WindowHandler window  = new WindowHandler();
       this.addWindowListener(window);
    }
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   public void setupMainFrame()
   {
     Toolkit   tk = Toolkit.getDefaultToolkit();
@@ -141,6 +142,7 @@ public void actionPerformed(ActionEvent e)
             if(userData.elementAt(2).toString().equals("1"))
             {
                System.out.println("SOMEONE PLEASE TURN ON THE ADMIN FEATURES!!");
+               adminDialog = new AdminDialog(connection);
             }
 
             loginButton.setEnabled(false);
@@ -234,7 +236,7 @@ private class WindowHandler extends WindowAdapter
       System.exit(0);
    }
 }
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 public static void main(String args[])
 { 
    DatabaseGui db = new DatabaseGui();
