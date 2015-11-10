@@ -18,6 +18,9 @@ public class DatabaseGui extends JFrame
    private JButton        searchButton;
    private JButton        userInfoButton;
    private JButton        sequelButton;
+   private JButton        adminButton;
+   private JButton        logoutButton;
+
 
    private JRadioButton   castButton;
    private JRadioButton   directorButton;
@@ -74,10 +77,12 @@ public class DatabaseGui extends JFrame
       moviesSelectionButtonGroup = new ButtonGroup();
 
       buttonUpdater();
- 
-      userInfoButton = new JButton("userInfoButton");
+      
+      userInfoButton = new JButton("Create User");
       loginButton    = new JButton("Login");
       sequelButton   = new JButton("Display Sequels");
+      adminButton    = new JButton("Admin Info");
+      logoutButton   = new JButton("Logout");
       //sequelButton.setEnabled(false);  Will add this once I know the button is working
       userInfoButton.setEnabled(false);
       loginPanel.setLayout(new GridLayout(2,2,0,5));
@@ -87,8 +92,10 @@ public class DatabaseGui extends JFrame
       loginPanel.add(pwdField);
       topPanel.add(loginPanel);
       topPanel.add(loginButton);
+      topPanel.add(logoutButton);
       topPanel.add(userInfoButton);
       topPanel.add(sequelButton);
+      topPanel.add(adminButton);
       add(topPanel,BorderLayout.NORTH);
       getRootPane().setDefaultButton(loginButton);
       loginButton.setActionCommand("LOGIN");
@@ -97,6 +104,13 @@ public class DatabaseGui extends JFrame
       userInfoButton.addActionListener(this);
       sequelButton.setActionCommand("SEQUEL");
       sequelButton.addActionListener(this);
+      adminButton.setActionCommand("ADMIN");
+      adminButton.addActionListener(this);
+      logoutButton.setActionCommand("LOGOUT");
+      logoutButton.addActionListener(this);
+      logoutButton.setEnabled(false);
+
+      adminButton.setVisible(false);
 
       radioButtonPanel   = new JPanel();
       gamesOrMoviesPanel = new JPanel();
@@ -157,8 +171,8 @@ public class DatabaseGui extends JFrame
   {
     Toolkit   tk = Toolkit.getDefaultToolkit();
     Dimension d  = tk.getScreenSize();
-    this.setSize(500, 500);
-    this.setMinimumSize(new Dimension(400, 500));
+    this.setSize(760, 500);
+    this.setMinimumSize(new Dimension(760, 500));
     this.setLocation(d.width/4, d.height/4);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setTitle("MOVIE'S R US");
@@ -174,6 +188,28 @@ public void actionPerformed(ActionEvent e)
    if((e.getActionCommand().equals("MOVIES"))||(e.getActionCommand().equals("GAMES")))
    {
         buttonUpdater();
+   }
+   else if((e.getActionCommand().equals("ADMIN")))
+   {
+        adminDialog.setVisible(true);
+   }
+   else if((e.getActionCommand().equals("LOGOUT")))
+   {
+      userInfoButton.setText("Create User");
+      loginButton.setEnabled(true);
+      idLabel.setEnabled(true);
+      pwdLabel.setEnabled(true);
+      idField.setEnabled(true);
+      pwdField.setEnabled(true);
+      searchButton.setEnabled(false);
+      searchField.setEnabled(false);
+      userInfoButton.setEnabled(false);
+      logoutButton.setEnabled(false);
+      getRootPane().setDefaultButton(loginButton);
+      adminButton.setVisible(false);
+      userData = new Vector<Object>();
+      userdialog = new UserInfoDialog(connection,userData);
+      userdialog.setVisible(false);
    }
    else if(e.getActionCommand().equals("LOGIN"))
    {
@@ -196,11 +232,17 @@ public void actionPerformed(ActionEvent e)
             metaData = resultSet.getMetaData();
             for(int i = 1; i <= metaData.getColumnCount(); ++i)
             {
-               userData.addElement(resultSet.getObject(i));
+               userData.add((i-1),resultSet.getObject(i));
                System.out.println(metaData.getColumnName(i)+": "+resultSet.getObject(i));
             }
             if(userData.elementAt(2).toString().equals("1"))
+            {
                adminDialog = new AdminDialog(connection);
+               adminDialog.setVisible(false);
+            }
+
+            userdialog = new UserInfoDialog(connection,userData);
+            userdialog.setVisible(false);
             loginButton.setEnabled(false);
             idLabel.setEnabled(false);
             pwdLabel.setEnabled(false);
@@ -209,6 +251,8 @@ public void actionPerformed(ActionEvent e)
             searchButton.setEnabled(true);
             searchField.setEnabled(true);
             userInfoButton.setEnabled(true);
+            userInfoButton.setText("User Info");
+            logoutButton.setEnabled(true);
             getRootPane().setDefaultButton(searchButton);
          }//END of else 
       }// end of try
@@ -225,9 +269,6 @@ public void actionPerformed(ActionEvent e)
    }//END IF LOGIN IF
    else if(e.getActionCommand().equals("USERINFO"))
    { 
-      if(userdialog == null)
-        userdialog = new UserInfoDialog(connection,userData);
-      else
         userdialog.setVisible(true);
    }
    else if(e.getActionCommand().equals("SEARCH"))
@@ -332,7 +373,7 @@ public void actionPerformed(ActionEvent e)
         {            
             if(dontShowRentedBeforeButton.isSelected())
             {
-                query = dbHandler.acquireResults + "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.gameGenreSearch+") as r2 on r2.rid = rip.rid" + ')';
+                query = dbHandler.acquireResults + "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.keywordGameSearch+") as r2 on r2.rid = rip.rid" + ')';
                 doQuery(query,searchField.getText(),4);
             }
             else
@@ -350,9 +391,14 @@ public void actionPerformed(ActionEvent e)
        String            query;
        PreparedStatement pstmt;
        
+       if(table.getSelectedRow() == -1)
+       {
+        JOptionPane.showMessageDialog(null,"Nothing seems to be selected!");
+       }
+       else
+       {
        ridHolder = (int)table.getValueAt(table.getSelectedRow(), 1);
        //System.out.println(ridHolder);
-       
        query = dbHandler.acquireResults + dbHandler.sequelSearch + ')';
        try
        {
@@ -399,22 +445,18 @@ public void actionPerformed(ActionEvent e)
                     getContentPane().remove(scroller);
                 
                 table = new JTable(rows, columnNames);
-                table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), 10*table.getRowHeight()));
+                table.setPreferredScrollableViewportSize(new Dimension(this.getWidth()-20, 10*table.getRowHeight()));
                 scroller = new JScrollPane(table);
                 getContentPane().add(scroller,BorderLayout.SOUTH);
                 validate();
             }
             pstmt.close();
+        }
+        catch(SQLException ex)
+        {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
+        }
        }
-       
-       catch(SQLException ex)
-       {
-           JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
-       }
-       //Note to self for tonight/tomorrow  Set the query up and then see if the result set is empty 
-       //using a conditional statement.  If it is, you are done,  else -- nest a while loop in the nest that will grab
-       //the next movie then make another query using its rid to find the next sequel,  continue to do this until
-       //the resultset.next() returns false
    }
 }//END OF ACTION PERFORMED
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -439,7 +481,7 @@ void doQuery(String querytodo,String searchFieldText,int count)
     }
     while(j <=count)
     {
-        pstmt.setString(j, searchFieldText);
+        pstmt.setString(j, '%'+searchFieldText+'%');
         j++;
     }
 
@@ -481,7 +523,7 @@ void doQuery(String querytodo,String searchFieldText,int count)
 
       // display table with ResultSet contents
       table = new JTable(rows, columnNames);
-      table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), 10*table.getRowHeight()));
+      table.setPreferredScrollableViewportSize(new Dimension(this.getWidth()-20, 10*table.getRowHeight()));
       scroller = new JScrollPane(table);
       getContentPane().add(scroller,BorderLayout.SOUTH);
       validate();
@@ -536,7 +578,7 @@ void doQuery(String query)
 
       // display table with ResultSet contents
       table = new JTable(rows, columnNames);
-      table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), 10*table.getRowHeight()));
+      table.setPreferredScrollableViewportSize(new Dimension(this.getWidth()-20, 10*table.getRowHeight()));
       scroller = new JScrollPane(table);
       getContentPane().add(scroller,BorderLayout.SOUTH);
       validate();
@@ -552,7 +594,6 @@ void doQuery(String query)
 
 void buttonUpdater()
 {
-    System.out.println("Buttons are being updated.");
     castButton.setSelected(false);
     directorButton.setSelected(false);
     awardButton.setSelected(false);

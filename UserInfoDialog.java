@@ -26,8 +26,14 @@ public class UserInfoDialog extends JDialog
       connection    = newConnection;
       topPanel      = new JPanel();
       refreshButton = new JButton("REFRESH");
-      userInfoLabel = new JLabel("USERINFO: PID:"+userInfo.elementAt(0)+" EMAIL:"+userInfo.elementAt(1)+" RentalQuota:"+userInfo.elementAt(3));
-      this.add(userInfoLabel,BorderLayout.SOUTH);
+      refreshButton.setVisible(false);
+      if(userInfo.size() != 0)
+      {
+        userInfoLabel = new JLabel("USERINFO: PID:"+userInfo.elementAt(0)+" EMAIL:"+userInfo.elementAt(1)+" RentalQuota:"+userInfo.elementAt(3));
+        refreshButton.setVisible(true);
+        this.add(userInfoLabel,BorderLayout.SOUTH);
+      }
+
       refreshButton.setActionCommand("REFRESH");
       refreshButton.addActionListener(this);
 
