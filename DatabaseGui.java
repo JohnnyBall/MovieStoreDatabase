@@ -270,6 +270,7 @@ public void actionPerformed(ActionEvent e)
    else if(e.getActionCommand().equals("USERINFO"))
    { 
         userdialog.setVisible(true);
+        userdialog.refreshButton.doClick();
    }
    else if(e.getActionCommand().equals("SEARCH"))
    {   

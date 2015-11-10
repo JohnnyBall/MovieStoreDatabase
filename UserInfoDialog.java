@@ -10,36 +10,67 @@ public class UserInfoDialog extends JDialog
 {
 
    private Vector<Object> userInfo;
-   private JButton        refreshButton;
+   public  JButton        refreshButton;
    private JPanel         topPanel;
+   private JPanel         buttonPanel;
    private JTable         table;
    private JScrollPane    scroller;
    private Connection     connection;
    private JLabel         userInfoLabel;
+   private JLabel         userNameLabel;
+   private JLabel         emailLabel;
+   private JLabel         quotaLabel;
+   private JLabel         pwdLabel;
    private DBHandler      dbhandler;
+   private JTextField     userNameField;
+   private JTextField     emailField;
+   private JTextField     quotaField;
+   private JPasswordField pwdField;
+
 
    public UserInfoDialog(Connection newConnection,Vector<Object> userInfo)
    {
-      setLayout(new FlowLayout(FlowLayout.CENTER));
+      topPanel      = new JPanel();
+      buttonPanel   = new JPanel();
       dbhandler     = new DBHandler();
       this.userInfo = userInfo;
       connection    = newConnection;
-      topPanel      = new JPanel();
       refreshButton = new JButton("REFRESH");
+      userNameLabel = new JLabel("User's Name: ");
+      userNameField = new JTextField();
+      emailLabel    = new JLabel("Email:");
+      emailField    = new JTextField();
+      quotaLabel    = new JLabel("Quota Amount:");
+      quotaField    = new JTextField();
+      pwdLabel      = new JLabel("Change Password: ");
+      pwdField      = new JPasswordField();
       refreshButton.setVisible(false);
-      if(userInfo.size() != 0)
-      {
-        userInfoLabel = new JLabel("USERINFO: PID:"+userInfo.elementAt(0)+" EMAIL:"+userInfo.elementAt(1)+" RentalQuota:"+userInfo.elementAt(3));
-        refreshButton.setVisible(true);
-        this.add(userInfoLabel,BorderLayout.SOUTH);
-      }
-
       refreshButton.setActionCommand("REFRESH");
       refreshButton.addActionListener(this);
 
-      topPanel.add(refreshButton);
+      topPanel.setLayout(new GridLayout(8,2,0,5));
 
-      add(topPanel,BorderLayout.CENTER);
+      if(userInfo.size() != 0)
+      {
+        //userNameField.setText();
+        emailField.setText(userInfo.elementAt(1).toString());
+        quotaField.setText(userInfo.elementAt(3).toString());
+        pwdField.setText(userInfo.elementAt(4).toString());
+        refreshButton.setVisible(true);
+      }
+
+      topPanel.add(userNameLabel);
+      topPanel.add(userNameField);
+      topPanel.add(emailLabel);
+      topPanel.add(emailField);
+      topPanel.add(quotaLabel);
+      topPanel.add(quotaField);
+      topPanel.add(pwdLabel);
+      topPanel.add(pwdField);
+
+      buttonPanel.add(refreshButton);
+      add(topPanel,BorderLayout.NORTH);      
+      add(buttonPanel,BorderLayout.CENTER);
 
       getRootPane().setDefaultButton(refreshButton);
       this.setupMainFrame();
@@ -49,11 +80,11 @@ public class UserInfoDialog extends JDialog
   {
     Toolkit   tk = Toolkit.getDefaultToolkit();
     Dimension d  = tk.getScreenSize();
-    this.setSize(500,300);
-    this.setMinimumSize(new Dimension(500,300));
+    this.setSize(500,400);
+    this.setMinimumSize(new Dimension(500,400));
     this.setLocation(d.width/4, d.height/4);
     setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-    setTitle("UserInfoDialog");
+    setTitle("User Info");
     setVisible(true);
   }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
