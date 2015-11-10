@@ -17,6 +17,7 @@ public class DatabaseGui extends JFrame
    private JButton        loginButton;
    private JButton        searchButton;
    private JButton        userInfoButton;
+   private JButton        sequelButton;
 
    private JRadioButton   castButton;
    private JRadioButton   directorButton;
@@ -76,6 +77,8 @@ public class DatabaseGui extends JFrame
  
       userInfoButton = new JButton("userInfoButton");
       loginButton    = new JButton("Login");
+      sequelButton   = new JButton("Display Sequels");
+      //sequelButton.setEnabled(false);  Will add this once I know the button is working
       userInfoButton.setEnabled(false);
       loginPanel.setLayout(new GridLayout(2,2,0,5));
       loginPanel.add(idLabel);
@@ -85,12 +88,15 @@ public class DatabaseGui extends JFrame
       topPanel.add(loginPanel);
       topPanel.add(loginButton);
       topPanel.add(userInfoButton);
+      topPanel.add(sequelButton);
       add(topPanel,BorderLayout.NORTH);
       getRootPane().setDefaultButton(loginButton);
       loginButton.setActionCommand("LOGIN");
       loginButton.addActionListener(this);
       userInfoButton.setActionCommand("USERINFO");
       userInfoButton.addActionListener(this);
+      sequelButton.setActionCommand("SEQUEL");
+      sequelButton.addActionListener(this);
 
       radioButtonPanel   = new JPanel();
       gamesOrMoviesPanel = new JPanel();
@@ -337,6 +343,79 @@ public void actionPerformed(ActionEvent e)
         }
       }//end of gamesButton.isSelected()
    }//END OF SEARCH ELSE
+   
+   else if(e.getActionCommand().equals("SEQUEL"))
+   {
+       int               ridHolder;
+       String            query;
+       PreparedStatement pstmt;
+       
+       ridHolder = (int)table.getValueAt(table.getSelectedRow(), 1);
+       //System.out.println(ridHolder);
+       
+       query = dbHandler.acquireResults + dbHandler.sequelSearch + ')';
+       try
+       {
+            pstmt = connection.prepareStatement(query);
+            pstmt.clearParameters();
+            pstmt.setInt(1, ridHolder);
+       
+            resultSet = pstmt.executeQuery();
+       
+            if(!resultSet.next()) 
+            {
+                JOptionPane.showMessageDialog(null,"No records found!");
+                return;
+            }
+       
+            else
+            {
+                Vector<Object> columnNames = new Vector<Object>();
+                Vector<Object> rows        = new Vector<Object>();
+                metaData                   = resultSet.getMetaData();
+                
+                for(int i = 1; i <= metaData.getColumnCount(); ++i)
+                    columnNames.addElement(metaData.getColumnName(i));
+                
+                do
+                {
+                    Vector<Object> currentRow = new Vector<Object>();
+                    for(int i = 1; i <= metaData.getColumnCount(); ++i)
+                    {
+                        currentRow.addElement(resultSet.getObject(i));
+                        
+                        if (i == 2)
+                            ridHolder = (int)resultSet.getObject(i);
+                    }
+                    rows.addElement(currentRow);
+                    pstmt.clearParameters();
+                    pstmt.setInt(1, ridHolder);
+                    
+                    resultSet = pstmt.executeQuery();
+                }
+                while(resultSet.next());
+                
+                if(scroller != null)
+                    getContentPane().remove(scroller);
+                
+                table = new JTable(rows, columnNames);
+                table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), 10*table.getRowHeight()));
+                scroller = new JScrollPane(table);
+                getContentPane().add(scroller,BorderLayout.SOUTH);
+                validate();
+            }
+            pstmt.close();
+       }
+       
+       catch(SQLException ex)
+       {
+           JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
+       }
+       //Note to self for tonight/tomorrow  Set the query up and then see if the result set is empty 
+       //using a conditional statement.  If it is, you are done,  else -- nest a while loop in the nest that will grab
+       //the next movie then make another query using its rid to find the next sequel,  continue to do this until
+       //the resultset.next() returns false
+   }
 }//END OF ACTION PERFORMED
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void doQuery(String querytodo,String searchFieldText,int count)

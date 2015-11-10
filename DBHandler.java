@@ -5,7 +5,7 @@ public class DBHandler
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     static final String DATABASE_URL = "jdbc:mysql://localhost:3306/moviestore";
     static final String USER = "root";
-    static final String PASS = "141305";  //Adust this according to local host login
+    static final String PASS = "Prog1";  //Adust this according to local host login
     
     public final String acquireResults;
     public final String directorSearch;
@@ -87,9 +87,9 @@ public class DBHandler
                          "FROM rentals_record_rents rrr, rentals r, user u " +
                          "WHERE u.pid = ?  AND rrr.rid = r.rid AND u.pid = rrr.pid";
         
-        sequelSearch = "SELECT DISTINCT r1.rid, r1.title " +
+        sequelSearch = "SELECT DISTINCT r1.rid " +
                        "FROM  rentals r,rentals r1, movie m, movie sm " +
-                       "WHERE r.rid = 201 AND m.rid_of_prequel = r.rid AND m.rid = r1.rid";
+                       "WHERE r.rid = ? AND m.rid_of_prequel = r.rid AND m.rid = r1.rid";
         
     }
     
