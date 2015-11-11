@@ -1,6 +1,7 @@
 // This program displays the results of a query on a database
 import java.sql.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -83,7 +84,7 @@ public class DatabaseGui extends JFrame
       sequelButton   = new JButton("Display Sequels");
       adminButton    = new JButton("Admin Info");
       logoutButton   = new JButton("Logout");
-      //sequelButton.setEnabled(false);  Will add this once I know the button is working
+      sequelButton.setEnabled(false);  
       userInfoButton.setEnabled(false);
       loginPanel.setLayout(new GridLayout(2,2,0,5));
       loginPanel.add(idLabel);
@@ -399,9 +400,10 @@ public void actionPerformed(ActionEvent e)
        }
        else
        {
-       ridHolder = (int)table.getValueAt(table.getSelectedRow(), 1);
+       ridHolder = (int)table.getValueAt(table.getSelectedRow(), 0);
        //System.out.println(ridHolder);
-       query = dbHandler.acquireResults + dbHandler.sequelSearch + ')';
+       //query = dbHandler.acquireResults + dbHandler.sequelSearch + ')';
+       query = dbHandler.sequelSearch;
        try
        {
             pstmt = connection.prepareStatement(query);
@@ -446,7 +448,15 @@ public void actionPerformed(ActionEvent e)
                 if(scroller != null)
                     getContentPane().remove(scroller);
                 
+                sequelButton.setEnabled(false);
                 table = new JTable(rows, columnNames);
+                table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+                {
+                    public void valueChanged(ListSelectionEvent event)
+                    {
+                        sequelButton.setEnabled(true);
+                    }
+                });
                 table.setPreferredScrollableViewportSize(new Dimension(this.getWidth()-20, 10*table.getRowHeight()));
                 scroller = new JScrollPane(table);
                 getContentPane().add(scroller,BorderLayout.SOUTH);
@@ -524,7 +534,15 @@ void doQuery(String querytodo,String searchFieldText,int count)
          getContentPane().remove(scroller);
 
       // display table with ResultSet contents
+      sequelButton.setEnabled(false);
       table = new JTable(rows, columnNames);
+      table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+      {
+          public void valueChanged(ListSelectionEvent event)
+          {
+             sequelButton.setEnabled(true);
+          }
+      });
       table.setPreferredScrollableViewportSize(new Dimension(this.getWidth()-20, 10*table.getRowHeight()));
       scroller = new JScrollPane(table);
       getContentPane().add(scroller,BorderLayout.SOUTH);
@@ -579,7 +597,15 @@ void doQuery(String query)
          getContentPane().remove(scroller);
 
       // display table with ResultSet contents
+      sequelButton.setEnabled(false);
       table = new JTable(rows, columnNames);
+      table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+      {
+          public void valueChanged(ListSelectionEvent event)
+          {
+             sequelButton.setEnabled(true);
+          }
+      });
       table.setPreferredScrollableViewportSize(new Dimension(this.getWidth()-20, 10*table.getRowHeight()));
       scroller = new JScrollPane(table);
       getContentPane().add(scroller,BorderLayout.SOUTH);
