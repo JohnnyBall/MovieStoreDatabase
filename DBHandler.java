@@ -99,7 +99,7 @@ public class DBHandler
                          "FROM rentals_record_rents rrr, rentals r, user u " +
                          "WHERE u.pid = ?  AND rrr.rid = r.rid AND u.pid = rrr.pid";
 
-        sequelSearch   = "SELECT DISTINCT r1.title, r1.rid " +
+        sequelSearch   = "SELECT DISTINCT r1.rid, r1.title " +
                          "FROM  rentals r,rentals r1, movie m, movie sm " +
                          "WHERE r.rid = ? AND m.rid_of_prequel = r.rid AND m.rid = r1.rid";
  

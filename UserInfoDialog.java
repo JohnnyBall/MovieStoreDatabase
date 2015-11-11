@@ -25,6 +25,10 @@ public class UserInfoDialog extends JDialog
    private DBHandler         dbhandler;
    private JTextField        userNameField;
    private JTextField        addressField;
+   private JTextField        stateField;
+   private JTextField        cityField;
+   private JTextField        zipField;
+   private JTextField        phoneField;
    private JTextField        emailField;
    private JTextField        quotaField;
    private JPasswordField    pwdField;
@@ -46,6 +50,10 @@ public class UserInfoDialog extends JDialog
       refreshButton = new JButton("REFRESH");
       userNameLabel = new JLabel("User's Name: ");
       addressField  = new JTextField();
+      stateField    = new JTextField();
+      cityField     = new JTextField();
+      zipField      = new JTextField();
+      phoneField      = new JTextField();
       addressLabel  = new JLabel("Address: ");
       userNameField = new JTextField();
       emailLabel    = new JLabel("Email:");
@@ -58,7 +66,7 @@ public class UserInfoDialog extends JDialog
       refreshButton.setActionCommand("REFRESH");
       refreshButton.addActionListener(this);
 
-      topPanel.setLayout(new GridLayout(10,2,0,5));
+      topPanel.setLayout(new GridLayout(18,2,0,5));
 
       if(userInfo.size() != 0)
       {
