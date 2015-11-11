@@ -239,6 +239,7 @@ public void actionPerformed(ActionEvent e)
             {
                adminDialog = new AdminDialog(connection);
                adminDialog.setVisible(false);
+               adminButton.setVisible(true);
             }
 
             userdialog = new UserInfoDialog(connection,userData);

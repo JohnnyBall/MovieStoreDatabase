@@ -106,8 +106,8 @@ public class UserInfoDialog extends JDialog
   {
     Toolkit   tk = Toolkit.getDefaultToolkit();
     Dimension d  = tk.getScreenSize();
-    this.setSize(500,400);
-    this.setMinimumSize(new Dimension(500,400));
+    this.setSize(500,500);
+    this.setMinimumSize(new Dimension(500,500));
     this.setLocation(d.width/4, d.height/4);
     setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
     setTitle("User Info");
