@@ -470,7 +470,7 @@ void doQuery(String querytodo,String searchFieldText,int count)
   try 
   {
 
-    pstmt            = connection.prepareStatement(querytodo);
+    pstmt = connection.prepareStatement(querytodo);
     System.out.println("querytodo: "+ querytodo);
     System.out.println("searchFieldText: "+searchFieldText);
     pstmt.clearParameters();

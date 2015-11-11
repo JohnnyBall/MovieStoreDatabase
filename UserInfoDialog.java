@@ -9,27 +9,33 @@ public class UserInfoDialog extends JDialog
                                  implements ActionListener
 {
 
-   private Vector<Object> userInfo;
-   public  JButton        refreshButton;
-   private JPanel         topPanel;
-   private JPanel         buttonPanel;
-   private JTable         table;
-   private JScrollPane    scroller;
-   private Connection     connection;
-   private JLabel         userInfoLabel;
-   private JLabel         userNameLabel;
-   private JLabel         emailLabel;
-   private JLabel         quotaLabel;
-   private JLabel         pwdLabel;
-   private DBHandler      dbhandler;
-   private JTextField     userNameField;
-   private JTextField     emailField;
-   private JTextField     quotaField;
-   private JPasswordField pwdField;
+   private Vector<Object>    userInfo;
+   public  JButton           refreshButton;
+   private JPanel            topPanel;
+   private JPanel            buttonPanel;
+   private JTable            table;
+   private JScrollPane       scroller;
+   private Connection        connection;
+   private JLabel            userInfoLabel;
+   private JLabel            userNameLabel;
+   private JLabel            emailLabel;
+   private JLabel            quotaLabel;
+   private JLabel            pwdLabel;
+   private DBHandler         dbhandler;
+   private JTextField        userNameField;
+   private JTextField        emailField;
+   private JTextField        quotaField;
+   private JPasswordField    pwdField;
+   private ResultSet         doQueryresultSet;
+   private ResultSetMetaData doQuerymetaData;
+   private PreparedStatement pstmt;
 
 
    public UserInfoDialog(Connection newConnection,Vector<Object> userInfo)
    {
+      
+      try
+      {
       topPanel      = new JPanel();
       buttonPanel   = new JPanel();
       dbhandler     = new DBHandler();
@@ -52,7 +58,22 @@ public class UserInfoDialog extends JDialog
 
       if(userInfo.size() != 0)
       {
-        //userNameField.setText();
+        pstmt = connection.prepareStatement(dbhandler.personNameSearch);
+        System.out.println("running this Query:"+dbhandler.personNameSearch);
+        pstmt.clearParameters();
+        pstmt.setString(1, userInfo.elementAt(0).toString());
+        doQueryresultSet = pstmt.executeQuery();
+        if(!doQueryresultSet.next()) 
+        {
+          JOptionPane.showMessageDialog(null,"No records found!");
+          return;
+        }
+        else
+        {
+          userNameField.setText(doQueryresultSet.getObject(1).toString());
+        }
+          pstmt.close();
+
         emailField.setText(userInfo.elementAt(1).toString());
         quotaField.setText(userInfo.elementAt(3).toString());
         pwdField.setText(userInfo.elementAt(4).toString());
@@ -74,6 +95,11 @@ public class UserInfoDialog extends JDialog
 
       getRootPane().setDefaultButton(refreshButton);
       this.setupMainFrame();
+      }
+      catch(SQLException ex) 
+      {
+        JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
+      }
    }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   public void setupMainFrame()
@@ -96,18 +122,14 @@ public void actionPerformed(ActionEvent e)
     doQuery( dbhandler.accountDetails,userInfo.elementAt(0).toString(),1);
    }
 }//end of action performed
-void doQuery(String querytodo,String searchFieldText,int count)
+void doQuery(String querytodo,String queryString,int count)
 {
-   ResultSet         doQueryresultSet;
-   ResultSetMetaData doQuerymetaData;
-   PreparedStatement pstmt;
   try 
   {
     pstmt = connection.prepareStatement(querytodo);
     System.out.println("querytodo: "+ querytodo);
-    System.out.println("searchFieldText: "+searchFieldText);
     pstmt.clearParameters();
-    pstmt.setString(1, searchFieldText);
+    pstmt.setString(1, queryString);
 
     doQueryresultSet = pstmt.executeQuery();
     System.out.println("About to Execute");
