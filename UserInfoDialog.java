@@ -21,8 +21,10 @@ public class UserInfoDialog extends JDialog
    private JLabel            emailLabel;
    private JLabel            quotaLabel;
    private JLabel            pwdLabel;
+   private JLabel            addressLabel;
    private DBHandler         dbhandler;
    private JTextField        userNameField;
+   private JTextField        addressField;
    private JTextField        emailField;
    private JTextField        quotaField;
    private JPasswordField    pwdField;
@@ -43,6 +45,8 @@ public class UserInfoDialog extends JDialog
       connection    = newConnection;
       refreshButton = new JButton("REFRESH");
       userNameLabel = new JLabel("User's Name: ");
+      addressField  = new JTextField();
+      addressLabel  = new JLabel("Address: ");
       userNameField = new JTextField();
       emailLabel    = new JLabel("Email:");
       emailField    = new JTextField();
@@ -54,10 +58,11 @@ public class UserInfoDialog extends JDialog
       refreshButton.setActionCommand("REFRESH");
       refreshButton.addActionListener(this);
 
-      topPanel.setLayout(new GridLayout(8,2,0,5));
+      topPanel.setLayout(new GridLayout(10,2,0,5));
 
       if(userInfo.size() != 0)
       {
+//THIS SHOULD BE A METHOD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////             
         pstmt = connection.prepareStatement(dbhandler.personNameSearch);
         System.out.println("running this Query:"+dbhandler.personNameSearch);
         pstmt.clearParameters();
@@ -72,7 +77,26 @@ public class UserInfoDialog extends JDialog
         {
           userNameField.setText(doQueryresultSet.getObject(1).toString());
         }
-          pstmt.close();
+        pstmt.close();
+
+//THIS SHOULD ALSO BE A METHOD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
+/*        pstmt = connection.prepareStatement(dbhandler.addressSearch);
+        System.out.println("running this Query:"+dbhandler.addressSearch);
+        pstmt.clearParameters();
+        pstmt.setString(1, userInfo.elementAt(0).toString());
+        doQueryresultSet = pstmt.executeQuery();
+        if(!doQueryresultSet.next()) 
+        {
+          JOptionPane.showMessageDialog(null,"No records found!");
+          return;
+        }
+        else
+        {
+          userNameField.setText(doQueryresultSet.getObject(1).toString());
+        }
+          pstmt.close();*/
+
+
 
         emailField.setText(userInfo.elementAt(1).toString());
         quotaField.setText(userInfo.elementAt(3).toString());
@@ -82,6 +106,8 @@ public class UserInfoDialog extends JDialog
 
       topPanel.add(userNameLabel);
       topPanel.add(userNameField);
+      topPanel.add(addressLabel);
+      topPanel.add(addressField);
       topPanel.add(emailLabel);
       topPanel.add(emailField);
       topPanel.add(quotaLabel);

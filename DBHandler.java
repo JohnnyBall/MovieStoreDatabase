@@ -5,7 +5,7 @@ public class DBHandler
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     static final String DATABASE_URL = "jdbc:mysql://localhost:3306/moviestore";
     static final String USER = "root";
-    static final String PASS = "aliasalias";  //Adust this according to local host login
+    static final String PASS = "butts";  //Adust this according to local host login
 
     public final String acquireResults;
     public final String directorSearch;
@@ -25,22 +25,24 @@ public class DBHandler
     public final String keywordGameSearch;
     public final String personNameSearch;
     public final String addressSearch;
+    public final String acquireResults2ElectricBugaloo;
 
     public DBHandler()
     {
 
-        acquireResults = "SELECT DISTINCT ar.title as RentalTitle, ar.rid as RENTALID " +
+        acquireResults = "SELECT DISTINCT * "+//"SELECT DISTINCT ar.title as RentalTitle, ar.rid as RENTALID " +
                          "FROM rentals ar " +
                          "WHERE ar.rid IN (";
 
 //GONA TRY AND MAKE THIS DISPLAY MORE THAN JUST THIS!!////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         acquireResults2ElectricBugaloo = "SELECT DISTINCT ar.title as RentalTitle, ar.rid as RENTALID " +
-                         "FROM rentals ar " +
-                         "WHERE ar.rid IN (";
+                                         "FROM rentals ar " +
+                                         "WHERE ar.rid IN (";
 
 
-        addressSearch = "SELECT"+
-                        ""+"";
+        addressSearch = "Select a.street, a.zip, a.phone, a.state, a.city "+
+                        "From has_address ha, address a, user u, person p "+
+                        "WHERE u.pid = ? AND u.pid = p.pid AND p.pid = ha.pid AND ha.zip = a.zip AND ha.street = a.street;";
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         directorSearch = "SELECT DISTINCT r.rid " +
                          "FROM rentals r, person p, director d, movie m " +
@@ -100,7 +102,7 @@ public class DBHandler
         sequelSearch   = "SELECT DISTINCT r1.rid " +
                          "FROM  rentals r,rentals r1, movie m, movie sm " +
                          "WHERE r.rid = ? AND m.rid_of_prequel = r.rid AND m.rid = r1.rid";
-
+ 
         keywordMovieSearch = " " + movieGenreSearch +" UNION " + castSearch +" UNION "+ directorSearch+" UNION " +titleMoviesSearch;
 
         keywordGameSearch = " " + gameGenreSearch +" UNION " + platformSearch +" UNION " +titleGamesSearch;
