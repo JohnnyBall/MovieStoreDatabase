@@ -434,7 +434,7 @@ public void actionPerformed(ActionEvent e)
                     {
                         currentRow.addElement(resultSet.getObject(i));
                         
-                        if (i == 2)
+                        if (i == 1)
                             ridHolder = (int)resultSet.getObject(i);
                     }
                     rows.addElement(currentRow);

@@ -10,6 +10,7 @@ public class UserInfoDialog extends JDialog
 {
 
    private Vector<Object>    userInfo;
+   private Vector<Object>    addressInfo;
    public  JButton           refreshButton;
    private JPanel            topPanel;
    private JPanel            buttonPanel;
@@ -22,6 +23,10 @@ public class UserInfoDialog extends JDialog
    private JLabel            quotaLabel;
    private JLabel            pwdLabel;
    private JLabel            addressLabel;
+   private JLabel            stateLabel;
+   private JLabel            cityLabel;
+   private JLabel            zipLabel;
+   private JLabel            phoneLabel;
    private DBHandler         dbhandler;
    private JTextField        userNameField;
    private JTextField        addressField;
@@ -46,6 +51,7 @@ public class UserInfoDialog extends JDialog
       buttonPanel   = new JPanel();
       dbhandler     = new DBHandler();
       this.userInfo = userInfo;
+      addressInfo   = new Vector<Object>();
       connection    = newConnection;
       refreshButton = new JButton("REFRESH");
       userNameLabel = new JLabel("User's Name: ");
@@ -53,8 +59,12 @@ public class UserInfoDialog extends JDialog
       stateField    = new JTextField();
       cityField     = new JTextField();
       zipField      = new JTextField();
-      phoneField      = new JTextField();
+      phoneField    = new JTextField();
       addressLabel  = new JLabel("Address: ");
+      stateLabel    = new JLabel("State: ");
+      cityLabel     = new JLabel("City: ");
+      zipLabel      = new JLabel("Zip: ");
+      phoneLabel    = new JLabel("Phone: ");
       userNameField = new JTextField();
       emailLabel    = new JLabel("Email:");
       emailField    = new JTextField();
@@ -84,8 +94,31 @@ public class UserInfoDialog extends JDialog
         else
         {
           userNameField.setText(doQueryresultSet.getObject(1).toString());
-        }
+        }        
         pstmt.close();
+        
+        pstmt = connection.prepareStatement(dbhandler.addressSearch);
+        pstmt.clearParameters();
+        pstmt.setInt(1, (int)userInfo.elementAt(0));
+        doQueryresultSet = pstmt.executeQuery();
+        if(!doQueryresultSet.next())
+        {
+            JOptionPane.showMessageDialog(null,"No records found!");
+            return;
+        }
+        else
+        {
+            for(int i = 1; i <= doQueryresultSet.getMetaData().getColumnCount(); ++i)
+                addressInfo.addElement(doQueryresultSet.getObject(i));
+        }
+        
+        pstmt.close();
+        
+        addressField.setText((String)addressInfo.elementAt(0));
+        cityField.setText((String)addressInfo.elementAt(1));
+        stateField.setText((String)addressInfo.elementAt(2));
+        zipField.setText(addressInfo.elementAt(3).toString());
+        phoneField.setText(addressInfo.elementAt(4).toString());
 
 //THIS SHOULD ALSO BE A METHOD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
 /*        pstmt = connection.prepareStatement(dbhandler.addressSearch);
@@ -110,12 +143,21 @@ public class UserInfoDialog extends JDialog
         quotaField.setText(userInfo.elementAt(3).toString());
         pwdField.setText(userInfo.elementAt(4).toString());
         refreshButton.setVisible(true);
+        
       }
 
       topPanel.add(userNameLabel);
       topPanel.add(userNameField);
       topPanel.add(addressLabel);
       topPanel.add(addressField);
+      topPanel.add(cityLabel);
+      topPanel.add(cityField);
+      topPanel.add(stateLabel);
+      topPanel.add(stateField);
+      topPanel.add(zipLabel);
+      topPanel.add(zipField);
+      topPanel.add(phoneLabel);
+      topPanel.add(phoneField);
       topPanel.add(emailLabel);
       topPanel.add(emailField);
       topPanel.add(quotaLabel);
@@ -140,9 +182,9 @@ public class UserInfoDialog extends JDialog
   {
     Toolkit   tk = Toolkit.getDefaultToolkit();
     Dimension d  = tk.getScreenSize();
-    this.setSize(500,500);
-    this.setMinimumSize(new Dimension(500,500));
-    this.setLocation(d.width/4, d.height/4);
+    this.setSize(500,750);
+    this.setMinimumSize(new Dimension(500,750));
+    this.setLocation(d.width/4, d.height/8);
     setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
     setTitle("User Info");
     setVisible(true);

@@ -40,7 +40,7 @@ public class DBHandler
                                          "WHERE ar.rid IN (";
 
 
-        addressSearch = "Select a.street, a.zip, a.phone, a.state, a.city "+
+        addressSearch = "Select a.street, a.city, a.state, a.zip, a.phone "+
                         "From has_address ha, address a, user u, person p "+
                         "WHERE u.pid = ? AND u.pid = p.pid AND p.pid = ha.pid AND ha.zip = a.zip AND ha.street = a.street;";
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
