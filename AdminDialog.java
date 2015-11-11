@@ -94,7 +94,7 @@ void doQuery(String query)
       // get column headers
       metaData = resultSet.getMetaData();
       for(int i = 1; i <= metaData.getColumnCount(); ++i)
-         columnNames.addElement(metaData.getColumnName(i));
+         columnNames.addElement(metaData.getColumnLabel(i));
       // get row data
       do 
       {

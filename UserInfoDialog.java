@@ -149,7 +149,7 @@ void doQuery(String querytodo,String queryString,int count)
       // get column headers
       doQuerymetaData = doQueryresultSet.getMetaData();
       for(int i = 1; i <= doQuerymetaData.getColumnCount(); ++i)
-         columnNames.addElement(doQuerymetaData.getColumnName(i));
+         columnNames.addElement(doQuerymetaData.getColumnLabel(i));
       // get row data
       do 
       {

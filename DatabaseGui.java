@@ -233,7 +233,7 @@ public void actionPerformed(ActionEvent e)
             for(int i = 1; i <= metaData.getColumnCount(); ++i)
             {
                userData.add((i-1),resultSet.getObject(i));
-               System.out.println(metaData.getColumnName(i)+": "+resultSet.getObject(i));
+               System.out.println(metaData.getColumnLabel(i)+": "+resultSet.getObject(i));
             }
             if(userData.elementAt(2).toString().equals("1"))
             {
@@ -423,7 +423,7 @@ public void actionPerformed(ActionEvent e)
                 metaData                   = resultSet.getMetaData();
                 
                 for(int i = 1; i <= metaData.getColumnCount(); ++i)
-                    columnNames.addElement(metaData.getColumnName(i));
+                    columnNames.addElement(metaData.getColumnLabel(i));
                 
                 do
                 {
@@ -509,7 +509,7 @@ void doQuery(String querytodo,String searchFieldText,int count)
       // get column headers
       doQuerymetaData = doQueryresultSet.getMetaData();
       for(int i = 1; i <= doQuerymetaData.getColumnCount(); ++i)
-         columnNames.addElement(doQuerymetaData.getColumnName(i));
+         columnNames.addElement(doQuerymetaData.getColumnLabel(i));
       // get row data
       do 
       {
@@ -564,7 +564,7 @@ void doQuery(String query)
       // get column headers
       metaData = resultSet.getMetaData();
       for(int i = 1; i <= metaData.getColumnCount(); ++i)
-         columnNames.addElement(metaData.getColumnName(i));
+         columnNames.addElement(metaData.getColumnLabel(i));
       // get row data
       do 
       {
