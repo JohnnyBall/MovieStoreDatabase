@@ -339,8 +339,10 @@ public void actionPerformed(ActionEvent e)
             }
             else
             {
-        //      query = "CREATE OR REPLACE view  search as  "+ dbHandler.awardWinnerSearch + ';';
-             // doQuery(query);
+              query = "CREATE OR REPLACE view  search as  "+ dbHandler.awardWinnerSearch + ';';
+              myexecuteQuery(query);
+              query = dbHandler.acquireResults2ElectricBugalooMovies;
+              doQuery(query);
             }
         }
         else if(keywordsButton.isSelected())
@@ -386,6 +388,7 @@ public void actionPerformed(ActionEvent e)
         {            
             if(dontShowRentedBeforeButton.isSelected())
             {
+                 System.out.println("BROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKE");
                 query = "CREATE OR REPLACE view  search as  "+"select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.gameGenreSearch+") as r2 on r2.rid = rip.rid" + ';';
                 myexecuteQuery(query,searchField.getText(),2);
                 query = dbHandler.acquireResults2ElectricBugalooGames;
@@ -403,6 +406,7 @@ public void actionPerformed(ActionEvent e)
         {            
             if(dontShowRentedBeforeButton.isSelected())
             {
+                 System.out.println("BROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKE");
                 query = "CREATE OR REPLACE view  search as "+ "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.keywordGameSearch+") as r2 on r2.rid = rip.rid" + ';';
                 myexecuteQuery(query,searchField.getText(),4);
                 query = dbHandler.acquireResults2ElectricBugalooGames;
@@ -538,7 +542,30 @@ void myexecuteQuery(String querytodo,String searchFieldText,int count)
   {
    JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
   }
-}// END OF DO QUERY 
+}// END OF DO QUERY
+void myexecuteQuery(String querytodo)
+{
+   PreparedStatement pstmt;
+
+  try 
+  {
+
+    pstmt = connection.prepareStatement(querytodo);
+    System.out.println(" in myexecuteQuery!!!!!");
+    System.out.println("querytodo: "+ querytodo);
+    pstmt.clearParameters();
+    pstmt.executeUpdate();
+    System.out.println("About to Execute");
+
+    pstmt.close();
+
+    System.out.println(" LEAVING myexecuteQuery!!!!!");
+  }//end of try
+  catch(SQLException ex) 
+  {
+   JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
+  }
+}// END OF DO QUERY  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void doQuery(String querytodo,String searchFieldText,int count)
