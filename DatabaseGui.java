@@ -283,64 +283,82 @@ public void actionPerformed(ActionEvent e)
         {
             if(dontShowRentedBeforeButton.isSelected())
             {
-                query = dbHandler.acquireResults + "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.directorSearch+") as r2 on r2.rid = rip.rid" + ')';
-                doQuery(query,searchField.getText(),2);
+                query = "CREATE OR REPLACE view  search as "+"select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.directorSearch+") as r2 on r2.rid = rip.rid" + ';';
+                myexecuteQuery(query,searchField.getText(),2);
+                query = dbHandler.acquireResults2ElectricBugalooMovies;
+                doQuery(query);
             }
             else
             {
-               query = dbHandler.acquireResults + dbHandler.directorSearch + ')';
-               doQuery(query,searchField.getText(),1);
+               query =  "CREATE OR REPLACE view  search as "+dbHandler.directorSearch + ';';
+               myexecuteQuery(query,searchField.getText(),1);
+               query = dbHandler.acquireResults2ElectricBugalooMovies;
+               doQuery(query);
             }
         }
         else if(castButton.isSelected())
         {   
             if(dontShowRentedBeforeButton.isSelected())
             {
-                query = dbHandler.acquireResults + "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.castSearch+") as r2 on r2.rid = rip.rid" + ')';
-                doQuery(query,searchField.getText(),2);
+                query = "CREATE OR REPLACE view  search as  "+"select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.castSearch+") as r2 on r2.rid = rip.rid" + ';';
+                myexecuteQuery(query,searchField.getText(),2);
+                query = dbHandler.acquireResults2ElectricBugalooMovies;
+                doQuery(query);
             }
             else
             {
-              query = dbHandler.acquireResults + dbHandler.castSearch + ')';
-              doQuery(query,searchField.getText(),1);
+              query = "CREATE OR REPLACE view  search as  "+ dbHandler.castSearch + ';';
+              myexecuteQuery(query,searchField.getText(),1);
+              query = dbHandler.acquireResults2ElectricBugalooMovies;
+              doQuery(query);
             }
         }
         else if(genreButton.isSelected())
         {   if(dontShowRentedBeforeButton.isSelected())
             {
-                query = dbHandler.acquireResults + "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.movieGenreSearch+") as r2 on r2.rid = rip.rid" + ')';
-                doQuery(query,searchField.getText(),2);
+                query = "CREATE OR REPLACE view  search as  "+ "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.movieGenreSearch+") as r2 on r2.rid = rip.rid" + ';';
+                myexecuteQuery(query,searchField.getText(),2);
+                query = dbHandler.acquireResults2ElectricBugalooMovies;
+                doQuery(query);
             }   
             else
             {
-                query = dbHandler.acquireResults + dbHandler.movieGenreSearch + ')';
-                doQuery(query,searchField.getText(),1);
+                query = "CREATE OR REPLACE view  search as  "+ dbHandler.movieGenreSearch + ';';
+                myexecuteQuery(query,searchField.getText(),1);
+                query = dbHandler.acquireResults2ElectricBugalooMovies;
+                doQuery(query);
+
             }
         }
         else if(awardButton.isSelected())
         {            
             if(dontShowRentedBeforeButton.isSelected())
             {
-                query = dbHandler.acquireResults + "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.awardWinnerSearch+") as r2 on r2.rid = rip.rid" + ')';
-                doQuery(query,searchField.getText(),1);
+            //    query = "CREATE OR REPLACE view  search as  "+ "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.awardWinnerSearch+") as r2 on r2.rid = rip.rid" + ';';
+             //   myexecuteQuery(query,searchField.getText(),1);
             }
             else
             {
-              query = dbHandler.acquireResults + dbHandler.awardWinnerSearch + ')';
-              doQuery(query);
+        //      query = "CREATE OR REPLACE view  search as  "+ dbHandler.awardWinnerSearch + ';';
+             // doQuery(query);
             }
         }
         else if(keywordsButton.isSelected())
         {            
             if(dontShowRentedBeforeButton.isSelected())
             {
-                query = dbHandler.acquireResults + "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.keywordMovieSearch+") as r2 on r2.rid = rip.rid" + ')';
-                doQuery(query,searchField.getText(),5);
+                query = "CREATE OR REPLACE view  search as  "+ "select rip.rid from (("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.keywordMovieSearch+") as r2 on r2.rid = rip.rid)" + ';';
+                myexecuteQuery(query,searchField.getText(),5);
+                System.out.println("BROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKE");
+                query = dbHandler.acquireResults2ElectricBugalooMovies;
+                doQuery(query);
             }
             else
             {
-              query = dbHandler.acquireResults + dbHandler.keywordMovieSearch + ')';
-              doQuery(query,searchField.getText(),4);
+              query = "CREATE OR REPLACE view  search as  "+  dbHandler.keywordMovieSearch + ';';
+              myexecuteQuery(query,searchField.getText(),4);
+              query = dbHandler.acquireResults2ElectricBugalooMovies;
+              doQuery(query);
             }
         }
       }// end moviesButton.isSelected()
@@ -349,40 +367,53 @@ public void actionPerformed(ActionEvent e)
         if(platformButton.isSelected())
         {            
             if(dontShowRentedBeforeButton.isSelected())
-            {
-                query = dbHandler.acquireResults + "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.platformSearch+") as r2 on r2.rid = rip.rid" + ')';
-                doQuery(query,searchField.getText(),2);
+            {  
+                System.out.println("BROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKE");
+                query = "CREATE OR REPLACE view  search as  "+ "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.platformSearch+") as r2 on r2.rid = rip.rid" + ';';
+                myexecuteQuery(query,searchField.getText(),2);
+                query = dbHandler.acquireResults2ElectricBugalooGames;
+                doQuery(query);
             }
             else
             {
-              query = dbHandler.acquireResults + dbHandler.platformSearch + ')';
-              doQuery(query,searchField.getText(),1);
+              query = "CREATE OR REPLACE view  search as  "+dbHandler.platformSearch + ';';
+              myexecuteQuery(query,searchField.getText(),1);
+              query = dbHandler.acquireResults2ElectricBugalooGames;
+              doQuery(query);
             }
         }
         else if(genreButton.isSelected())
         {            
             if(dontShowRentedBeforeButton.isSelected())
             {
-                query = dbHandler.acquireResults + "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.gameGenreSearch+") as r2 on r2.rid = rip.rid" + ')';
-                doQuery(query,searchField.getText(),2);
+                query = "CREATE OR REPLACE view  search as  "+"select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.gameGenreSearch+") as r2 on r2.rid = rip.rid" + ';';
+                myexecuteQuery(query,searchField.getText(),2);
+                query = dbHandler.acquireResults2ElectricBugalooGames;
+                doQuery(query);
             }
             else
             {
-              query = dbHandler.acquireResults + dbHandler.gameGenreSearch + ')';
-              doQuery(query,searchField.getText(),1);
+              query = "CREATE OR REPLACE view  search as  "+ dbHandler.gameGenreSearch + ';';
+              myexecuteQuery(query,searchField.getText(),1);
+              query = dbHandler.acquireResults2ElectricBugalooGames;
+              doQuery(query);
             }
         }
         else if(keywordsButton.isSelected())
         {            
             if(dontShowRentedBeforeButton.isSelected())
             {
-                query = dbHandler.acquireResults + "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.keywordGameSearch+") as r2 on r2.rid = rip.rid" + ')';
-                doQuery(query,searchField.getText(),4);
+                query = "CREATE OR REPLACE view  search as "+ "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.keywordGameSearch+") as r2 on r2.rid = rip.rid" + ';';
+                myexecuteQuery(query,searchField.getText(),4);
+                query = dbHandler.acquireResults2ElectricBugalooGames;
+                doQuery(query);
             }
             else
             {
-              query = dbHandler.acquireResults + dbHandler.keywordGameSearch + ')';
-              doQuery(query,searchField.getText(),3);
+              query = "CREATE OR REPLACE view  search as "+ dbHandler.keywordGameSearch + ';';
+              myexecuteQuery(query,searchField.getText(),3);
+              query = dbHandler.acquireResults2ElectricBugalooGames;
+              doQuery(query);
             }
         }
       }//end of gamesButton.isSelected()
@@ -472,6 +503,44 @@ public void actionPerformed(ActionEvent e)
    }
 }//END OF ACTION PERFORMED
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void myexecuteQuery(String querytodo,String searchFieldText,int count)
+{
+   PreparedStatement pstmt;
+   int j = 1;
+  try 
+  {
+
+    pstmt = connection.prepareStatement(querytodo);
+    System.out.println(" in myexecuteQuery!!!!!");
+    System.out.println("querytodo: "+ querytodo);
+    System.out.println("searchFieldText: "+searchFieldText);
+    pstmt.clearParameters();
+
+    if (dontShowRentedBeforeButton.isSelected())
+    {
+        pstmt.setString(1, userData.elementAt(0).toString());
+        j++;
+    }
+    while(j <=count)
+    {
+        pstmt.setString(j, '%'+searchFieldText+'%');
+        j++;
+    }
+
+    pstmt.executeUpdate();
+    System.out.println("About to Execute");
+
+    pstmt.close();
+
+    System.out.println(" LEAVING myexecuteQuery!!!!!");
+  }//end of try
+  catch(SQLException ex) 
+  {
+   JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
+  }
+}// END OF DO QUERY 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void doQuery(String querytodo,String searchFieldText,int count)
 {
    ResultSet         doQueryresultSet;
