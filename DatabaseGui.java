@@ -19,6 +19,7 @@ public class DatabaseGui extends JFrame
    private JButton        searchButton;
    private JButton        userInfoButton;
    private JButton        sequelButton;
+   private JButton        displayAwardsButton;
    private JButton        adminButton;
    private JButton        logoutButton;
 
@@ -79,12 +80,14 @@ public class DatabaseGui extends JFrame
 
       buttonUpdater();
       
-      userInfoButton = new JButton("Create User");
-      loginButton    = new JButton("Login");
-      sequelButton   = new JButton("Display Sequels");
-      adminButton    = new JButton("Admin Info");
-      logoutButton   = new JButton("Logout");
+      userInfoButton        = new JButton("Create User");
+      loginButton           = new JButton("Login");
+      sequelButton          = new JButton("Display Sequels");
+      displayAwardsButton   = new JButton("Display Awards");
+      adminButton           = new JButton("Admin Info");
+      logoutButton          = new JButton("Logout");
       sequelButton.setEnabled(false);  
+      displayAwardsButton.setEnabled(false);  
       userInfoButton.setEnabled(false);
       loginPanel.setLayout(new GridLayout(2,2,0,5));
       loginPanel.add(idLabel);
@@ -96,6 +99,7 @@ public class DatabaseGui extends JFrame
       topPanel.add(logoutButton);
       topPanel.add(userInfoButton);
       topPanel.add(sequelButton);
+      topPanel.add(displayAwardsButton);
       topPanel.add(adminButton);
       add(topPanel,BorderLayout.NORTH);
       getRootPane().setDefaultButton(loginButton);
@@ -105,6 +109,8 @@ public class DatabaseGui extends JFrame
       userInfoButton.addActionListener(this);
       sequelButton.setActionCommand("SEQUEL");
       sequelButton.addActionListener(this);
+      displayAwardsButton.setActionCommand("AWARDS");
+      displayAwardsButton.addActionListener(this);
       adminButton.setActionCommand("ADMIN");
       adminButton.addActionListener(this);
       logoutButton.setActionCommand("LOGOUT");
@@ -334,8 +340,10 @@ public void actionPerformed(ActionEvent e)
         {            
             if(dontShowRentedBeforeButton.isSelected())
             {
-            //    query = "CREATE OR REPLACE view  search as  "+ "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.awardWinnerSearch+") as r2 on r2.rid = rip.rid" + ';';
-             //   myexecuteQuery(query,searchField.getText(),1);
+               query = "CREATE OR REPLACE view  search as  "+ "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.awardWinnerSearch+") as r2 on r2.rid = rip.rid" + ';';
+               myexecuteQuery(query,searchField.getText(),1);
+               query = dbHandler.acquireResults2ElectricBugalooMovies;
+               doQuery(query);
             }
             else
             {
@@ -484,12 +492,17 @@ public void actionPerformed(ActionEvent e)
                     getContentPane().remove(scroller);
                 
                 sequelButton.setEnabled(false);
+                displayAwardsButton.setEnabled(false);
                 table = new JTable(rows, columnNames);
                 table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
                 {
                     public void valueChanged(ListSelectionEvent event)
                     {
-                        sequelButton.setEnabled(true);
+                        if(!gamesButton.isSelected())
+                        {
+                            sequelButton.setEnabled(true);
+                            displayAwardsButton.setEnabled(true);
+                        }
                     }
                 });
                 table.setPreferredScrollableViewportSize(new Dimension(this.getWidth()-20, 10*table.getRowHeight()));
@@ -503,6 +516,24 @@ public void actionPerformed(ActionEvent e)
         {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
         }
+       }
+   }
+   
+   else if(e.getActionCommand().equals("AWARDS"))
+   {
+       int ridHolder;
+       String titleHolder;
+       
+       if(table.getSelectedRow() == -1)
+       {
+        JOptionPane.showMessageDialog(null,"Nothing seems to be selected!");
+       }
+       else
+       {
+       ridHolder = (int)table.getValueAt(table.getSelectedRow(), 0);
+       titleHolder = (String)table.getValueAt(table.getSelectedRow(), 1);
+       
+       new AwardDialog(connection, titleHolder, ridHolder);
        }
    }
 }//END OF ACTION PERFORMED
@@ -631,12 +662,17 @@ void doQuery(String querytodo,String searchFieldText,int count)
 
       // display table with ResultSet contents
       sequelButton.setEnabled(false);
+      displayAwardsButton.setEnabled(false);
       table = new JTable(rows, columnNames);
       table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
       {
           public void valueChanged(ListSelectionEvent event)
           {
-             sequelButton.setEnabled(true);
+             if(!gamesButton.isSelected())
+              {
+                sequelButton.setEnabled(true);
+                displayAwardsButton.setEnabled(true);
+              }
           }
       });
       table.setPreferredScrollableViewportSize(new Dimension(this.getWidth()-20, 10*table.getRowHeight()));
@@ -694,12 +730,17 @@ void doQuery(String query)
 
       // display table with ResultSet contents
       sequelButton.setEnabled(false);
+      displayAwardsButton.setEnabled(false);
       table = new JTable(rows, columnNames);
       table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
       {
           public void valueChanged(ListSelectionEvent event)
           {
-             sequelButton.setEnabled(true);
+              if(!gamesButton.isSelected())
+              {
+                sequelButton.setEnabled(true);
+                displayAwardsButton.setEnabled(true);
+              }
           }
       });
       table.setPreferredScrollableViewportSize(new Dimension(this.getWidth()-20, 10*table.getRowHeight()));

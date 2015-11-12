@@ -43,7 +43,7 @@ WHERE mgb.gName like '%drama%' AND mgb.rid = mg.rid AND mg.rid = mgr.rid;*/
 
         acquireResults2ElectricBugalooMovies = //"SELECT DISTINCT Rental1.rid as Rental_Id , Rental1.title as RentalTitle, Rental1.releaseDate as ReleaseDate, Rental1.num_availible_copys as AmountAvaliable, Genr.Genres,CastMember.CastMembers, Director.Director,AwardTi.AwardTitles  FROM "+
                                                "SELECT DISTINCT Rental1.rid as Rental_Id , Rental1.title as RentalTitle, Rental1.releaseDate as ReleaseDate, Rental1.num_availible_copys as AmountAvaliable, Genr.Genres,CastMember.CastMembers, Director.Director " +
-                                               //"IF(Rental1.rid IN(AwardTi.rid), AwardTi.AwardTitles, 'None')" +
+                                               //"IF(Rental1.rid = ANY(AwardTi.rid), AwardTi.AwardTitles, 'None') " +
                                                "FROM "+
                                                "(SELECT r.rid, r.title , r.releaseDate, r.num_availible_copys "+
                                                "FROM rentals r, search srs  "+
