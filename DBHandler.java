@@ -41,7 +41,7 @@ SELECT DISTINCT mgr.rid
 FROM  rentals mgr, belongs_to_genre mgb, movie mg  
 WHERE mgb.gName like '%drama%' AND mgb.rid = mg.rid AND mg.rid = mgr.rid;*/
 
-        acquireResults2ElectricBugalooMovies = "SELECT DISTINCT Rental1.rid as Rental_Id , Rental1.title as RentalTitle, Rental1.releaseDate as ReleaseDate, Rental1.num_availible_copys as AmountAvaliable, Genr.Genres,CastMember.CastMembers, Director.Director,AwardTi.AwardTitles  FROM "+
+        acquireResults2ElectricBugalooMovies = "SELECT DISTINCT Rental1.rid as Rental_Id , Rental1.title as RentalTitle, Rental1.releaseDate as ReleaseDate, Rental1.num_availible_copys as AmountAvaliable, Genr.Genres,CastMember.CastMembers, Director.Director"+/*,AwardTi.AwardTitles*/ " FROM "+
                                                "(SELECT r.rid, r.title , r.releaseDate, r.num_availible_copys "+
                                                "FROM rentals r, search srs  "+
                                                "where r.rid = srs.rid) as Rental1 "+
@@ -55,14 +55,14 @@ WHERE mgb.gName like '%drama%' AND mgb.rid = mg.rid AND mg.rid = mgr.rid;*/
                                                "WHERE   dir.pid = md.pid and persdirect.pid = dir.pid and rntd.rid =  md.rid and rntd.rid = sd.rid "+
                                                "group by rntd.rid) as Director, "+
                                                "(SELECT rgen.rid, GROUP_CONCAT(gen.gname) as Genres "+
-                                               "FROM    belongs_to_Genre gen, rentals rgen,search sg "+
-                                               "WHERE   rgen.rid = gen.rid and rgen.rid = sg.rid "+
-                                               "group by rgen.rid) as Genr, "+
-                                               "(SELECT rawd.rid, GROUP_CONCAT(hwaa.aTitle) as AwardTitles "+
-                                               "FROM    has_won_award hwaa, rentals rawd, search sat "+
-                                               "WHERE   hwaa.rid = rawd.rid and rawd.rid = sat.rid "+
-                                               "group by rawd.rid) as AwardTi "+
-                                               "where Rental1.rid = AwardTi.rid and AwardTi.rid = Genr.rid  and Genr.rid = Director.rid and  Director.rid  = CastMember.rid; ";
+                                               "FROM    belongs_to_Genre gen, movie mg, rentals rgen,search sg "+
+                                               "WHERE   mg.rid = rgen.rid and rgen.rid  = gen.rid and mg.rid = sg.rid "+
+                                               "group by rgen.rid) as Genr "+
+                                               //"(SELECT rawd.rid, GROUP_CONCAT(hwaa.aTitle) as AwardTitles "+
+                                               //"FROM    has_won_award hwaa, rentals rawd, search sat "+
+                                               //"//WHERE   hwaa.rid = rawd.rid and rawd.rid = sat.rid "+
+                                               //"group by rawd.rid) as AwardTi "+
+                                               "where Rental1.rid "+/*= AwardTi.rid and AwardTi.rid */"= Genr.rid  and Genr.rid = Director.rid and  Director.rid  = CastMember.rid; ";
 
 
 //EXAMPLE OF CREATE VIEW FOR WHEN ITS NEEDED
