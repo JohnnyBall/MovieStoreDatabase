@@ -444,9 +444,9 @@ public void actionPerformed(ActionEvent e)
        else
        {
        ridHolder = (int)table.getValueAt(table.getSelectedRow(), 0);
-       //System.out.println(ridHolder);
-       //query = dbHandler.acquireResults + dbHandler.sequelSearch + ')';
        query = dbHandler.sequelSearch;
+       //query = "CREATE OR REPLACE view  search as  "+  dbHandler.sequelSearch + ';';
+       System.out.println(query + " " + ridHolder);
        try
        {
             pstmt = connection.prepareStatement(query);
@@ -454,6 +454,26 @@ public void actionPerformed(ActionEvent e)
             pstmt.setInt(1, ridHolder);
        
             resultSet = pstmt.executeQuery();
+            System.out.println("HERE");
+            if(!resultSet.next()) 
+            {
+                JOptionPane.showMessageDialog(null,"No records found!");
+                return;
+            }
+            else
+            {
+                ridHolder = (int)resultSet.getObject(1);
+            }
+            pstmt.close();
+            
+            query = dbHandler.acquireResults2ElectricBugalooSequels;
+            pstmt = connection.prepareStatement(query);
+            pstmt.clearParameters();
+            for(int i = 1; i <= 4; ++i)
+                pstmt.setInt(i, ridHolder);
+            
+            resultSet = pstmt.executeQuery();
+            System.out.println("OR HERE " + ridHolder);
        
             if(!resultSet.next()) 
             {
@@ -481,8 +501,24 @@ public void actionPerformed(ActionEvent e)
                             ridHolder = (int)resultSet.getObject(i);
                     }
                     rows.addElement(currentRow);
+                    pstmt.close();
+                    pstmt = connection.prepareStatement(dbHandler.sequelSearch);
                     pstmt.clearParameters();
+                    System.out.println(ridHolder);
                     pstmt.setInt(1, ridHolder);
+                    resultSet = pstmt.executeQuery();
+                    
+                    if(resultSet.next()) 
+                        ridHolder = (int)resultSet.getObject(1);
+                    else
+                        ridHolder = 999;
+                  
+                    pstmt.close();
+                    
+                    pstmt = connection.prepareStatement(query);
+                    pstmt.clearParameters();
+                    for(int i = 1; i <= 4; ++i)
+                        pstmt.setInt(i, ridHolder);
                     
                     resultSet = pstmt.executeQuery();
                 }

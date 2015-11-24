@@ -11,7 +11,9 @@ public class UserInfoDialog extends JDialog
 
    private Vector<Object>    userInfo;
    private Vector<Object>    addressInfo;
+   private Vector<Object>    editInfo;
    public  JButton           refreshButton;
+   public  JButton           editButton;
    private JPanel            topPanel;
    private JPanel            buttonPanel;
    private JTable            table;
@@ -54,6 +56,7 @@ public class UserInfoDialog extends JDialog
       addressInfo   = new Vector<Object>();
       connection    = newConnection;
       refreshButton = new JButton("REFRESH");
+      editButton    = new JButton("Submit Detail Edits");
       userNameLabel = new JLabel("User's Name: ");
       addressField  = new JTextField();
       stateField    = new JTextField();
@@ -70,6 +73,7 @@ public class UserInfoDialog extends JDialog
       emailField    = new JTextField();
       quotaLabel    = new JLabel("Quota Amount:");
       quotaField    = new JTextField();
+      quotaField.setEditable(false);
       pwdLabel      = new JLabel("Change Password: ");
       pwdField      = new JPasswordField();
       refreshButton.setVisible(false);
@@ -166,11 +170,24 @@ public class UserInfoDialog extends JDialog
       topPanel.add(pwdField);
 
       buttonPanel.add(refreshButton);
+      buttonPanel.add(editButton);
       add(topPanel,BorderLayout.NORTH);      
       add(buttonPanel,BorderLayout.CENTER);
 
       getRootPane().setDefaultButton(refreshButton);
       this.setupMainFrame();
+      editInfo = new Vector<Object>();
+      
+      editInfo.addElement(userNameField.getText());
+      editInfo.addElement(addressField.getText());
+      editInfo.addElement(cityField.getText());
+      editInfo.addElement(stateField.getText());
+      editInfo.addElement(zipField.getText());
+      editInfo.addElement(phoneField.getText());
+      editInfo.addElement(emailField.getText());
+      editInfo.addElement(quotaField.getText());
+      editInfo.addElement(new String(pwdField.getPassword()));
+      
       }
       catch(SQLException ex) 
       {
@@ -197,6 +214,51 @@ public void actionPerformed(ActionEvent e)
    {              
     doQuery( dbhandler.accountDetails,userInfo.elementAt(0).toString(),1);
    }
+  
+  else if(e.getActionCommand().equals("EDIT"))
+  {
+      if(!(editInfo.elementAt(0).toString().equals(userNameField.getText().trim())) && !(userNameField.getText().trim().equals("")))
+      {
+          editInfo.addElement(userNameField.getText().trim());
+      }
+      
+      if(!(editInfo.elementAt(1).toString().equals(addressField.getText().trim())) && !(addressField.getText().trim().equals("")))
+      {
+          editInfo.addElement(addressField.getText().trim());
+      }
+      
+      if(!(editInfo.elementAt(2).toString().equals(cityField.getText().trim())) && !(cityField.getText().trim().equals("")))
+      {
+          editInfo.addElement(cityField.getText().trim());
+      }
+      
+      if(!(editInfo.elementAt(3).toString().equals(stateField.getText().trim())) && !(stateField.getText().trim().equals("")))
+      {
+          editInfo.addElement(stateField.getText().trim());
+      }
+      
+      if(!(editInfo.elementAt(4).toString().equals(zipField.getText().trim())) && !(zipField.getText().trim().equals("")))
+      {
+          editInfo.addElement(zipField.getText().trim());
+      }
+      
+      if(!(editInfo.elementAt(5).toString().equals(phoneField.getText().trim())) && !(phoneField.getText().trim().equals("")))
+      {
+          editInfo.addElement(phoneField.getText().trim());
+      }
+      
+      if(!(editInfo.elementAt(6).toString().equals(emailField.getText().trim())) && !(emailField.getText().trim().equals("")))
+      {
+          editInfo.addElement(emailField.getText().trim());
+      }
+      
+      if(!(editInfo.elementAt(8).toString().equals(new String(pwdField.getPassword()).trim())) && !(new String(pwdField.getPassword()).trim().equals("")))
+      {
+          editInfo.addElement(new String(pwdField.getPassword()).trim());
+      }
+      
+      //Values in editInfo should be ready to send in a transaction to update userInfo
+  }
 }//end of action performed
 void doQuery(String querytodo,String queryString,int count)
 {

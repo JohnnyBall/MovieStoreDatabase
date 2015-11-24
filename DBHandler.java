@@ -27,6 +27,7 @@ public class DBHandler
     public final String addressSearch;
     public final String acquireResults2ElectricBugalooMovies;
     public final String acquireResults2ElectricBugalooGames;
+    public final String acquireResults2ElectricBugalooSequels;
 
     public DBHandler()
     {
@@ -60,11 +61,11 @@ WHERE mgb.gName like '%drama%' AND mgb.rid = mg.rid AND mg.rid = mgr.rid;*/
                                                "(SELECT rgen.rid, GROUP_CONCAT(gen.gname) as Genres "+
                                                "FROM    belongs_to_Genre gen, rentals rgen,search sg "+
                                                "WHERE   rgen.rid = gen.rid and rgen.rid = sg.rid "+
-                                               "group by rgen.rid) as Genr, "+
-                                               "(SELECT rawd.rid, GROUP_CONCAT(hwaa.aTitle) as AwardTitles "+
-                                               "FROM    has_won_award hwaa, rentals rawd, search sat "+
-                                               "WHERE   hwaa.rid = rawd.rid and rawd.rid = sat.rid "+
-                                               "group by rawd.rid) as AwardTi "+
+                                               "group by rgen.rid) as Genr "+
+                                               //"(SELECT rawd.rid, GROUP_CONCAT(hwaa.aTitle) as AwardTitles "+
+                                               //"FROM    has_won_award hwaa, rentals rawd, search sat "+
+                                               //"WHERE   hwaa.rid = rawd.rid and rawd.rid = sat.rid "+
+                                               //"group by rawd.rid) as AwardTi "+
                                                //"where Rental1.rid = AwardTi.rid and AwardTi.rid = Genr.rid  and Genr.rid = Director.rid and  Director.rid  = CastMember.rid; ";
                                                "where Rental1.rid = Genr.rid and Genr.rid = Director.rid and Director.rid  = CastMember.rid; ";
 
@@ -90,6 +91,27 @@ WHERE mgb.gName like '%first person shooter%' AND mgb.rid = mg.rid AND mg.rid = 
                                               "WHERE   plat.rid = g.rid and g.rid = rplat.rid and rplat.rid = sg.rid "+
                                               "group by g.rid) as plat "+
                                               "where plat.rid = Genr.genrid and Genr.genrid = Rental1.rid;";
+        
+        
+        acquireResults2ElectricBugalooSequels = "SELECT DISTINCT Rental1.rid as Rental_Id , Rental1.title as RentalTitle, Rental1.releaseDate as ReleaseDate, Rental1.num_availible_copys as AmountAvaliable, Genr.Genres,CastMember.CastMembers, Director.Director " +
+                                                "FROM "+
+                                                "(SELECT r.rid, r.title , r.releaseDate, r.num_availible_copys "+
+                                                "FROM rentals r "+
+                                                "where r.rid = ? ) as Rental1 "+
+                                                "JOIN "+
+                                                "(SELECT rnt.rid, GROUP_CONCAT(persmcast.pname) as CastMembers "+
+                                                "FROM    person persmcast, mcast mc, was_in wasin, movie movmc, rentals rnt "+
+                                                "WHERE   mc.pid = persmcast.pid and wasin.pid = mc.pid and wasin.rid = movmc.rid and rnt.rid =  movmc.rid and rnt.rid = ? "+
+                                                "group by movmc.rid) as CastMember, "+
+                                                "(SELECT rntd.rid, GROUP_CONCAT(persdirect.pname) as Director "+
+                                                "FROM    person persdirect,  movie md, rentals rntd, director dir "+
+                                                "WHERE   dir.pid = md.pid and persdirect.pid = dir.pid and rntd.rid =  md.rid and rntd.rid = ? "+
+                                                "group by rntd.rid) as Director, "+
+                                                "(SELECT rgen.rid, GROUP_CONCAT(gen.gname) as Genres "+
+                                                "FROM    belongs_to_Genre gen, rentals rgen "+
+                                                "WHERE   rgen.rid = gen.rid and rgen.rid = ? "+
+                                                "group by rgen.rid) as Genr "+
+                                                "where Rental1.rid = Genr.rid and Genr.rid = Director.rid and Director.rid  = CastMember.rid; ";
 
 
         addressSearch = "Select a.street, a.city, a.state, a.zip, a.phone "+
@@ -151,7 +173,7 @@ WHERE mgb.gName like '%first person shooter%' AND mgb.rid = mg.rid AND mg.rid = 
                          "FROM rentals_record_rents rrr, rentals r, user u " +
                          "WHERE u.pid = ?  AND rrr.rid = r.rid AND u.pid = rrr.pid";
 
-        sequelSearch   = "SELECT DISTINCT r1.rid, r1.title " +
+        sequelSearch   = "SELECT DISTINCT r1.rid " + //, r1.title " +
                          "FROM  rentals r,rentals r1, movie m, movie sm " +
                          "WHERE r.rid = ? AND m.rid_of_prequel = r.rid AND m.rid = r1.rid";
  
