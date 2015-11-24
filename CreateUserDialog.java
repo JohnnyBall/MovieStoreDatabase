@@ -1,18 +1,15 @@
-// This program displays the results of a query on a database
 import java.sql.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-
-public class UserInfoDialog extends JDialog
+public class CreateUserDialog extends JDialog
                                  implements ActionListener
 {
 
    private Vector<Object>    userInfo;
    private Vector<Object>    addressInfo;
    private Vector<Object>    editInfo;
-   public  JButton           refreshButton;
    public  JButton           editButton;
    private JPanel            topPanel;
    private JPanel            buttonPanel;
@@ -44,21 +41,15 @@ public class UserInfoDialog extends JDialog
    private PreparedStatement pstmt;
 
 
-   public UserInfoDialog(Connection newConnection,Vector<Object> userInfo)
+   public CreateUserDialog(Connection newConnection, boolean isAdmin)
    {
-      
-      try
-      {
       topPanel      = new JPanel();
       buttonPanel   = new JPanel();
       dbhandler     = new DBHandler();
       this.userInfo = userInfo;
-      addressInfo   = new Vector<Object>();
       connection    = newConnection;
-      refreshButton = new JButton("REFRESH");
+      addressInfo   = new Vector<Object>();
       editButton    = new JButton("Submit Detail Edits");
-      userNameLabel = new JLabel("User's Name: ");
-      userNameField = new JTextField();
       addressLabel  = new JLabel("Address: ");
       addressField  = new JTextField();
       stateLabel    = new JLabel("State: ");
@@ -69,87 +60,26 @@ public class UserInfoDialog extends JDialog
       zipField      = new JTextField();
       phoneLabel    = new JLabel("Phone: ");
       phoneField    = new JTextField();
+      userNameLabel = new JLabel("User's Name: ");
+      userNameField = new JTextField();
       emailLabel    = new JLabel("Email:");
       emailField    = new JTextField();
-      quotaLabel    = new JLabel("Quota Amount:");
-      quotaField    = new JTextField();
+      if(!isAdmin)
+      {
+        quotaLabel    = new JLabel("Quota Amount:");
+        quotaField    = new JTextField("3");
+        quotaField.setEnabled(false);
+      }
+      else
+      {
+        quotaLabel    = new JLabel("Quota Amount:");
+        quotaField    = new JTextField();
+      }
       pwdLabel      = new JLabel("Change Password: ");
       pwdField      = new JPasswordField();
-      quotaField.setEditable(false);
-      refreshButton.setVisible(false);
-      refreshButton.setActionCommand("REFRESH");
-      refreshButton.addActionListener(this);
 
       topPanel.setLayout(new GridLayout(18,2,0,5));
-
-      if(userInfo.size() != 0)
-      {
-//THIS SHOULD BE A METHOD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////             
-        pstmt = connection.prepareStatement(dbhandler.personNameSearch);
-        System.out.println("running this Query:"+dbhandler.personNameSearch);
-        pstmt.clearParameters();
-        pstmt.setString(1, userInfo.elementAt(0).toString());
-        doQueryresultSet = pstmt.executeQuery();
-        if(!doQueryresultSet.next()) 
-        {
-          JOptionPane.showMessageDialog(null,"No records found!");
-          return;
-        }
-        else
-        {
-          userNameField.setText(doQueryresultSet.getObject(1).toString());
-        }        
-        pstmt.close();
-        
-        pstmt = connection.prepareStatement(dbhandler.addressSearch);
-        pstmt.clearParameters();
-        pstmt.setInt(1, (int)userInfo.elementAt(0));
-        doQueryresultSet = pstmt.executeQuery();
-        if(!doQueryresultSet.next())
-        {
-            JOptionPane.showMessageDialog(null,"No records found!");
-            return;
-        }
-        else
-        {
-            for(int i = 1; i <= doQueryresultSet.getMetaData().getColumnCount(); ++i)
-                addressInfo.addElement(doQueryresultSet.getObject(i));
-        }
-        
-        pstmt.close();
-        
-        addressField.setText((String)addressInfo.elementAt(0));
-        cityField.setText((String)addressInfo.elementAt(1));
-        stateField.setText((String)addressInfo.elementAt(2));
-        zipField.setText(addressInfo.elementAt(3).toString());
-        phoneField.setText(addressInfo.elementAt(4).toString());
-
-//THIS SHOULD ALSO BE A METHOD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
-/*        pstmt = connection.prepareStatement(dbhandler.addressSearch);
-        System.out.println("running this Query:"+dbhandler.addressSearch);
-        pstmt.clearParameters();
-        pstmt.setString(1, userInfo.elementAt(0).toString());
-        doQueryresultSet = pstmt.executeQuery();
-        if(!doQueryresultSet.next()) 
-        {
-          JOptionPane.showMessageDialog(null,"No records found!");
-          return;
-        }
-        else
-        {
-          userNameField.setText(doQueryresultSet.getObject(1).toString());
-        }
-          pstmt.close();*/
-
-
-
-        emailField.setText(userInfo.elementAt(1).toString());
-        quotaField.setText(userInfo.elementAt(3).toString());
-        pwdField.setText(userInfo.elementAt(4).toString());
-        refreshButton.setVisible(true);
-        
-      }
-
+      
       topPanel.add(userNameLabel);
       topPanel.add(userNameField);
       topPanel.add(addressLabel);
@@ -168,13 +98,11 @@ public class UserInfoDialog extends JDialog
       topPanel.add(quotaField);
       topPanel.add(pwdLabel);
       topPanel.add(pwdField);
-
-      buttonPanel.add(refreshButton);
       buttonPanel.add(editButton);
       add(topPanel,BorderLayout.NORTH);      
       add(buttonPanel,BorderLayout.CENTER);
 
-      getRootPane().setDefaultButton(refreshButton);
+      getRootPane().setDefaultButton(editButton);
       this.setupMainFrame();
       editInfo = new Vector<Object>();
       
@@ -187,13 +115,7 @@ public class UserInfoDialog extends JDialog
       editInfo.addElement(emailField.getText());
       editInfo.addElement(quotaField.getText());
       editInfo.addElement(new String(pwdField.getPassword()));
-      
-      }
-      catch(SQLException ex) 
-      {
-        JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
-      }
-   }
+    }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   public void setupMainFrame()
   {
@@ -203,19 +125,15 @@ public class UserInfoDialog extends JDialog
     this.setMinimumSize(new Dimension(500,750));
     this.setLocation(d.width/4, d.height/8);
     setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-    setTitle("User Info");
+    setTitle("Add User");
     setVisible(true);
   }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 public void actionPerformed(ActionEvent e)
 {  
-  if(e.getActionCommand().equals("REFRESH"))
-   {              
-    doQuery( dbhandler.accountDetails,userInfo.elementAt(0).toString(),1);
-   }
-  
-  else if(e.getActionCommand().equals("EDIT"))
+
+  if(e.getActionCommand().equals("EDIT"))
   {
       if(!(editInfo.elementAt(0).toString().equals(userNameField.getText().trim())) && !(userNameField.getText().trim().equals("")))
       {
@@ -314,5 +232,9 @@ void doQuery(String querytodo,String queryString,int count)
   {
    JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
   }
-}// END OF DO QUERY 
+}// END OF DO QUERY
+/*public static void main(String args[])
+{ 
+   CreateUserDialog db = new CreateUserDialog();
+} */
 }//END OF CLASS

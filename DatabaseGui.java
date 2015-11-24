@@ -9,51 +9,53 @@ import java.util.*;
 public class DatabaseGui extends JFrame
                                  implements ActionListener
 {
-   private JLabel         idLabel;
-   private JLabel         pwdLabel;
-   private JTextField     idField;
-   private JPasswordField pwdField;
-   private JTextField     searchField;
+   private JLabel           idLabel;
+   private JLabel           pwdLabel;
+   private JTextField       idField;
+   private JPasswordField   pwdField;
+   private JTextField       searchField;
 
-   private JButton        loginButton;
-   private JButton        searchButton;
-   private JButton        userInfoButton;
-   private JButton        sequelButton;
-   private JButton        displayAwardsButton;
-   private JButton        adminButton;
-   private JButton        logoutButton;
+   private JButton          loginButton;
+   private JButton          searchButton;
+   private JButton          userInfoButton;
+   private JButton          sequelButton;
+   private JButton          displayAwardsButton;
+   private JButton          adminButton;
+   private JButton          rentButton;
+   private JButton          logoutButton;
 
 
-   private JRadioButton   castButton;
-   private JRadioButton   directorButton;
-   private JRadioButton   genreButton;
-   private JRadioButton   awardButton;
-   private JRadioButton   platformButton;
-   private JRadioButton   gamesButton;
-   private JRadioButton   moviesButton;
-   private JRadioButton   keywordsButton;
-   private JRadioButton   dontShowRentedBeforeButton;
+   private JRadioButton     castButton;
+   private JRadioButton     directorButton;
+   private JRadioButton     genreButton;
+   private JRadioButton     awardButton;
+   private JRadioButton     platformButton;
+   private JRadioButton     gamesButton;
+   private JRadioButton     moviesButton;
+   private JRadioButton     keywordsButton;
+   private JRadioButton     dontShowRentedBeforeButton;
 
-   private ButtonGroup  gamesOrMoviesButtonGroup;
-   private ButtonGroup  moviesSelectionButtonGroup;
-   private ButtonGroup  gamesSelectionButtonGroup;
+   private ButtonGroup      gamesOrMoviesButtonGroup;
+   private ButtonGroup      moviesSelectionButtonGroup;
+   private ButtonGroup      gamesSelectionButtonGroup;
 
-   private JPanel         topPanel;
-   private JPanel         loginPanel;
-   private JPanel         queryPanel;
-   private JPanel         radioButtonPanel;
-   private JPanel         gamesOrMoviesPanel;
+   private JPanel           topPanel;
+   private JPanel           loginPanel;
+   private JPanel           queryPanel;
+   private JPanel           radioButtonPanel;
+   private JPanel           gamesOrMoviesPanel;
 
-   private JTable         table;
-   private JScrollPane    scroller;
+   private JTable           table;
+   private JScrollPane      scroller;
 
-   private Connection     connection;
-   private AdminDialog    adminDialog;
-   private UserInfoDialog userdialog;
+   private Connection       connection;
+   private AdminDialog      adminDialog;
+   private UserInfoDialog   userdialog;
+   private CreateUserDialog createuserdialog;
    
-   private DBHandler      dbHandler;
+   private DBHandler        dbHandler;
 
-   Vector<Object>         userData;
+   Vector<Object>           userData;
    public DatabaseGui()
    {
       setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -81,12 +83,14 @@ public class DatabaseGui extends JFrame
       buttonUpdater();
       
       userInfoButton        = new JButton("Create User");
+      rentButton            = new JButton("Rent");
       loginButton           = new JButton("Login");
       sequelButton          = new JButton("Display Sequels");
       displayAwardsButton   = new JButton("Display Awards");
       adminButton           = new JButton("Admin Info");
       logoutButton          = new JButton("Logout");
-      sequelButton.setEnabled(false);  
+      sequelButton.setEnabled(false);
+      rentButton.setEnabled(false);   
       displayAwardsButton.setEnabled(false);  
       userInfoButton.setEnabled(false);
       loginPanel.setLayout(new GridLayout(2,2,0,5));
@@ -100,6 +104,7 @@ public class DatabaseGui extends JFrame
       topPanel.add(userInfoButton);
       topPanel.add(sequelButton);
       topPanel.add(displayAwardsButton);
+      topPanel.add(rentButton);
       topPanel.add(adminButton);
       add(topPanel,BorderLayout.NORTH);
       getRootPane().setDefaultButton(loginButton);
@@ -113,6 +118,8 @@ public class DatabaseGui extends JFrame
       displayAwardsButton.addActionListener(this);
       adminButton.setActionCommand("ADMIN");
       adminButton.addActionListener(this);
+      rentButton.setActionCommand("RENT");
+      rentButton.addActionListener(this);
       logoutButton.setActionCommand("LOGOUT");
       logoutButton.addActionListener(this);
       logoutButton.setEnabled(false);
@@ -178,8 +185,8 @@ public class DatabaseGui extends JFrame
   {
     Toolkit   tk = Toolkit.getDefaultToolkit();
     Dimension d  = tk.getScreenSize();
-    this.setSize(760, 500);
-    this.setMinimumSize(new Dimension(760, 500));
+    this.setSize(850, 500);
+    this.setMinimumSize(new Dimension(850, 500));
     this.setLocation(d.width/4, d.height/4);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setTitle("MOVIE'S R US");
@@ -212,6 +219,7 @@ public void actionPerformed(ActionEvent e)
       searchField.setEnabled(false);
       userInfoButton.setEnabled(false);
       logoutButton.setEnabled(false);
+      rentButton.setEnabled(false);  
       getRootPane().setDefaultButton(loginButton);
       adminButton.setVisible(false);
       userData = new Vector<Object>();
@@ -359,7 +367,6 @@ public void actionPerformed(ActionEvent e)
             {
                 query = "CREATE OR REPLACE view  search as  "+ "select rip.rid from (("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.keywordMovieSearch+") as r2 on r2.rid = rip.rid)" + ';';
                 myexecuteQuery(query,searchField.getText(),5);
-                System.out.println("BROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKE");
                 query = dbHandler.acquireResults2ElectricBugalooMovies;
                 doQuery(query);
             }
@@ -378,7 +385,6 @@ public void actionPerformed(ActionEvent e)
         {            
             if(dontShowRentedBeforeButton.isSelected())
             {  
-                System.out.println("BROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKE");
                 query = "CREATE OR REPLACE view  search as  "+ "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.platformSearch+") as r2 on r2.rid = rip.rid" + ';';
                 myexecuteQuery(query,searchField.getText(),2);
                 query = dbHandler.acquireResults2ElectricBugalooGames;
@@ -396,7 +402,6 @@ public void actionPerformed(ActionEvent e)
         {            
             if(dontShowRentedBeforeButton.isSelected())
             {
-                 System.out.println("BROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKE");
                 query = "CREATE OR REPLACE view  search as  "+"select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.gameGenreSearch+") as r2 on r2.rid = rip.rid" + ';';
                 myexecuteQuery(query,searchField.getText(),2);
                 query = dbHandler.acquireResults2ElectricBugalooGames;
@@ -414,7 +419,6 @@ public void actionPerformed(ActionEvent e)
         {            
             if(dontShowRentedBeforeButton.isSelected())
             {
-                 System.out.println("BROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKEBROKE");
                 query = "CREATE OR REPLACE view  search as "+ "select rip.rid from ("+dbHandler.notRentedSearch +" ) as rip INNER JOIN (" + dbHandler.keywordGameSearch+") as r2 on r2.rid = rip.rid" + ';';
                 myexecuteQuery(query,searchField.getText(),4);
                 query = dbHandler.acquireResults2ElectricBugalooGames;
@@ -699,6 +703,7 @@ void doQuery(String querytodo,String searchFieldText,int count)
       // display table with ResultSet contents
       sequelButton.setEnabled(false);
       displayAwardsButton.setEnabled(false);
+      rentButton.setEnabled(false); 
       table = new JTable(rows, columnNames);
       table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
       {
@@ -707,8 +712,9 @@ void doQuery(String querytodo,String searchFieldText,int count)
              if(!gamesButton.isSelected())
               {
                 sequelButton.setEnabled(true);
-                displayAwardsButton.setEnabled(true);
+                displayAwardsButton.setEnabled(true); 
               }
+              rentButton.setEnabled(true); 
           }
       });
       table.setPreferredScrollableViewportSize(new Dimension(this.getWidth()-20, 10*table.getRowHeight()));
@@ -767,6 +773,7 @@ void doQuery(String query)
       // display table with ResultSet contents
       sequelButton.setEnabled(false);
       displayAwardsButton.setEnabled(false);
+      rentButton.setEnabled(false);  
       table = new JTable(rows, columnNames);
       table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
       {
@@ -775,8 +782,9 @@ void doQuery(String query)
               if(!gamesButton.isSelected())
               {
                 sequelButton.setEnabled(true);
-                displayAwardsButton.setEnabled(true);
+                displayAwardsButton.setEnabled(true); 
               }
+              rentButton.setEnabled(true); 
           }
       });
       table.setPreferredScrollableViewportSize(new Dimension(this.getWidth()-20, 10*table.getRowHeight()));
