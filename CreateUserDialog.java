@@ -178,35 +178,38 @@ void createUserQueryExecuter()
 //-------------------------------------------------------------------------------------------------------------------------------
     // Inserts the Newly Created user into the persons table
     pstmt.clearParameters();
-    pstmt       = connection.prepareStatement(" INSERT INTO User(pid, email, is_admin, rental_quota, user_password) VALUES (?, ?, 0, ?, ?);");
+    pstmt = connection.prepareStatement(" INSERT INTO User(pid, email, is_admin, rental_quota, user_password) VALUES (?, ?, 0, ?, ?);");
     pstmt.setInt(1,maxPid);
-
     pstmt.setString(2, emailField.getText().trim());//email
-    System.out.println("emailField " + emailField.getText().trim());
-
     pstmt.setInt(3, Integer.parseInt(quotaField.getText().trim()));//rental_quota
-    System.out.println("quotaField "+ quotaField.getText().trim());
-
     pstmt.setString(4, new String(pwdField.getPassword()));//user_password
-    System.out.println("pwdField "+ new String(pwdField.getPassword()));
-    
     System.out.println("pstmt: " +pstmt.toString());
     System.out.println("About to Execute");
     pstmt.execute();
-
 //-------------------------------------------------------------------------------------------------------------------------------
     // And here's where id keep my Addresses, IF I HAD ANYYY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // Have some addresses now, here they are, they will make it so that users rentals can be shipped to them, isnt that nice?!
     pstmt.clearParameters();
-    //System.out.println("pstmt: " +pstmt.toString());
-    //pstmt       = connection.prepareStatement(" INSERT INTO User(pid, email, is_admin, rental_quota, user_password) VALUES (?, ?, 0, ?, ?);");
-    //pstmt.setString(6, userData.elementAt(0).toString());
-    //pstmt.setString(7, userData.elementAt(0).toString());
-    //pstmt.setString(8, userData.elementAt(0).toString());
-    //pstmt.setString(9, userData.elementAt(0).toString());
-    //System.out.println("pstmt: " +pstmt.toString());
-    //System.out.println("About to Execute");
-    //pstmt.execute();
-
+    pstmt = connection.prepareStatement("INSERT address(street, zip, phone, state, city) VALUES(?, ?, ?, ?, ?);");
+    pstmt.setString(1, addressField.getText().trim());//sets address
+    pstmt.setInt(2, Integer.parseInt(zipField.getText().trim()));// sets zipcode int
+    pstmt.setString(3, phoneField.getText().trim());// sets phone number
+    pstmt.setString(4, stateField.getText().trim());// sets state
+    pstmt.setString(5, cityField.getText().trim());//sets city
+    System.out.println("pstmt: " + pstmt.toString());
+    System.out.println("About to Execute");
+    pstmt.execute();
+//-------------------------------------------------------------------------------------------------------------------------------
+    //Sets up the users has_address field so that we can know where to connect the addresses to the peoples then we can ship their rentals! 
+    pstmt.clearParameters();
+    pstmt = connection.prepareStatement("INSERT has_address(pid, street, zip) VALUES(?, ?, ?);");
+    pstmt.setInt(1,maxPid);// Sets pid for new person value
+    pstmt.setString(2, addressField.getText().trim());//sets address
+    pstmt.setInt(3, Integer.parseInt(zipField.getText().trim()));// sets zipcode int
+    System.out.println("pstmt: " + pstmt.toString());
+    System.out.println("About to Execute");
+    pstmt.execute();
+//-------------------------------------------------------------------------------------------------------------------------------
     pstmt.close();
   }//end of try
   catch(SQLException ex) 
