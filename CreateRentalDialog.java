@@ -156,46 +156,47 @@ public class CreateRentalDialog extends JDialog
 
 public void actionPerformed(ActionEvent e)
 {  
+  /*   private JTextField        titleField;
+   private JTextField        amountField;
+   private JTextField        releaseDateField;
+   private JTextField        genreField;
+   private JTextField        platFormField;
+   private JTextField        directorField;
+   private JTextField        castMemberField;
+   private JTextField        sequelField;
+   private JTextField        awardsField;*/
   if((e.getActionCommand().equals("MOVIES"))||(e.getActionCommand().equals("GAMES")))
   {
     fieldUpdater();
   }
   else if(e.getActionCommand().equals("SUBMIT"))
   {
-      /*if(!( !(titleField.getText().trim().equals("")))
+    if (gamesButton.isSelected() && !(titleField.getText().trim().equals("")) && !(amountField.getText().trim().equals("")) && !(releaseDateField.getText().trim().equals("")) && !(genreField.getText().trim().equals("")) && !(platFormField.getText().trim().equals("")))
+    {
+      try
       {
-          editInfo.addElement(titleField.getText().trim());
+        Integer.parseInt(amountField.getText().trim());
       }
-      
-      if(!( !(amountField.getText().trim().equals("")))
+      catch (NumberFormatException nfe)
       {
-          editInfo.addElement(amountField.getText().trim());
+        JOptionPane.showMessageDialog(this,"Please make sure data in either the zip field or the quotaField is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
       }
-      
-      if(!( !(genreField.getText().trim().equals("")))
+    }
+    else if(moviesButton.isSelected() && !(titleField.getText().trim().equals("")) && !(amountField.getText().trim().equals("")) && !(releaseDateField.getText().trim().equals("")) && !(genreField.getText().trim().equals("")) && !(directorField.getText().trim().equals("")))
+    {
+      try
       {
-          editInfo.addElement(genreField.getText().trim());
+        Integer.parseInt(amountField.getText().trim());
       }
-      
-      if(!( !(releaseDateField.getText().trim().equals("")))
+      catch (NumberFormatException nfe)
       {
-          editInfo.addElement(releaseDateField.getText().trim());
+        JOptionPane.showMessageDialog(this,"Please make sure data in either the zip field or the quotaField is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
       }
-      
-      if(!( !(platFormField.getText().trim().equals("")))
-      {
-          editInfo.addElement(platFormField.getText().trim());
-      }
-      
-      if(!( !(directorField.getText().trim().equals("")))
-      {
-          editInfo.addElement(directorField.getText().trim());
-      }
-      
-      if(!( !(sequelField.getText().trim().equals("")))
-      {
-          editInfo.addElement(sequelField.getText().trim());
-      }*/
+    }
+    else
+    {
+      JOptionPane.showMessageDialog(this,"Please make sure data is entered in every Field.","RIP.",JOptionPane.WARNING_MESSAGE);
+    }
       //Values in editInfo should be ready to send in a transaction to update userInfo
   }
 }//end of action performed

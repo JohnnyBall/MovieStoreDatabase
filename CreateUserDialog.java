@@ -6,16 +6,11 @@ import java.util.*;
 public class CreateUserDialog extends JDialog
                                  implements ActionListener
 {
-
-   private Vector<Object>    userInfo;
-   private Vector<Object>    addressInfo;
-   private Vector<Object>    editInfo;
+   private JTable            table;
+   private JScrollPane       scroller;
    public  JButton           editButton;
    private JPanel            topPanel;
    private JPanel            buttonPanel;
-   private JTable            table;
-   private JScrollPane       scroller;
-   private Connection        connection;
    private JLabel            userInfoLabel;
    private JLabel            userNameLabel;
    private JLabel            emailLabel;
@@ -26,7 +21,7 @@ public class CreateUserDialog extends JDialog
    private JLabel            cityLabel;
    private JLabel            zipLabel;
    private JLabel            phoneLabel;
-   private DBHandler         dbhandler;
+   
    private JTextField        userNameField;
    private JTextField        addressField;
    private JTextField        stateField;
@@ -36,9 +31,13 @@ public class CreateUserDialog extends JDialog
    private JTextField        emailField;
    private JTextField        quotaField;
    private JPasswordField    pwdField;
-   private ResultSet         doQueryresultSet;
-   private ResultSetMetaData doQuerymetaData;
+
+   private DBHandler         dbhandler;
+   private ResultSet         resultSet;
+   private ResultSetMetaData metaData;
    private PreparedStatement pstmt;
+   private Statement         statement;
+   private Connection        connection;
 
 
    public CreateUserDialog(Connection newConnection, boolean isAdmin)
@@ -46,9 +45,7 @@ public class CreateUserDialog extends JDialog
       topPanel      = new JPanel();
       buttonPanel   = new JPanel();
       dbhandler     = new DBHandler();
-      this.userInfo = userInfo;
       connection    = newConnection;
-      addressInfo   = new Vector<Object>();
       editButton    = new JButton("Submit Detail Edits");
       addressLabel  = new JLabel("Address: ");
       addressField  = new JTextField();
@@ -98,23 +95,14 @@ public class CreateUserDialog extends JDialog
       topPanel.add(quotaField);
       topPanel.add(pwdLabel);
       topPanel.add(pwdField);
+      editButton.setActionCommand("EDIT");
+      editButton.addActionListener(this);
       buttonPanel.add(editButton);
       add(topPanel,BorderLayout.NORTH);      
       add(buttonPanel,BorderLayout.CENTER);
 
       getRootPane().setDefaultButton(editButton);
       this.setupMainFrame();
-      editInfo = new Vector<Object>();
-      
-      editInfo.addElement(userNameField.getText());
-      editInfo.addElement(addressField.getText());
-      editInfo.addElement(cityField.getText());
-      editInfo.addElement(stateField.getText());
-      editInfo.addElement(zipField.getText());
-      editInfo.addElement(phoneField.getText());
-      editInfo.addElement(emailField.getText());
-      editInfo.addElement(quotaField.getText());
-      editInfo.addElement(new String(pwdField.getPassword()));
     }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   public void setupMainFrame()
@@ -129,112 +117,106 @@ public class CreateUserDialog extends JDialog
     setVisible(true);
   }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 public void actionPerformed(ActionEvent e)
 {  
-
   if(e.getActionCommand().equals("EDIT"))
   {
-      if(!(editInfo.elementAt(0).toString().equals(userNameField.getText().trim())) && !(userNameField.getText().trim().equals("")))
+
+    if( !(userNameField.getText().trim().equals("")) && !(addressField.getText().trim().equals("")) && 
+        !(cityField.getText().trim().equals("")) && !(stateField.getText().trim().equals("")) && !(quotaField.getText().trim().equals("")) && 
+        !(zipField.getText().trim().equals(""))  && !(phoneField.getText().trim().equals("")) && !(emailField.getText().trim().equals("")) && 
+        !(new String(pwdField.getPassword()).trim().equals("")))
+    {
+      try
       {
-          editInfo.addElement(userNameField.getText().trim());
+        Integer.parseInt(zipField.getText().trim());
+        Integer.parseInt(quotaField.getText().trim());
+        createUserQueryExecuter();
       }
-      
-      if(!(editInfo.elementAt(1).toString().equals(addressField.getText().trim())) && !(addressField.getText().trim().equals("")))
+      catch (NumberFormatException nfe)
       {
-          editInfo.addElement(addressField.getText().trim());
+        JOptionPane.showMessageDialog(this,"Please make sure data in either the zip field or the quotaField is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
       }
-      
-      if(!(editInfo.elementAt(2).toString().equals(cityField.getText().trim())) && !(cityField.getText().trim().equals("")))
-      {
-          editInfo.addElement(cityField.getText().trim());
-      }
-      
-      if(!(editInfo.elementAt(3).toString().equals(stateField.getText().trim())) && !(stateField.getText().trim().equals("")))
-      {
-          editInfo.addElement(stateField.getText().trim());
-      }
-      
-      if(!(editInfo.elementAt(4).toString().equals(zipField.getText().trim())) && !(zipField.getText().trim().equals("")))
-      {
-          editInfo.addElement(zipField.getText().trim());
-      }
-      
-      if(!(editInfo.elementAt(5).toString().equals(phoneField.getText().trim())) && !(phoneField.getText().trim().equals("")))
-      {
-          editInfo.addElement(phoneField.getText().trim());
-      }
-      
-      if(!(editInfo.elementAt(6).toString().equals(emailField.getText().trim())) && !(emailField.getText().trim().equals("")))
-      {
-          editInfo.addElement(emailField.getText().trim());
-      }
-      
-      if(!(editInfo.elementAt(8).toString().equals(new String(pwdField.getPassword()).trim())) && !(new String(pwdField.getPassword()).trim().equals("")))
-      {
-          editInfo.addElement(new String(pwdField.getPassword()).trim());
-      }
-      
-      //Values in editInfo should be ready to send in a transaction to update userInfo
+    }
+    else
+    {
+      JOptionPane.showMessageDialog(this,"Please make sure data is entered in every Field.","RIP.",JOptionPane.WARNING_MESSAGE);
+    }
   }
 }//end of action performed
-void doQuery(String querytodo,String queryString,int count)
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void createUserQueryExecuter()
 {
+  int maxPid = 0;
   try 
   {
-    pstmt = connection.prepareStatement(querytodo);
-    System.out.println("querytodo: "+ querytodo);
-    pstmt.clearParameters();
-    pstmt.setString(1, queryString);
-
-    doQueryresultSet = pstmt.executeQuery();
-    System.out.println("About to Execute");
-    //If there are no records, display a message
-    if(!doQueryresultSet.next()) 
+//-------------------------------------------------------------------------------------------------------------------------------
+    // Retrieves the max pid from the Person table, then sets our max pid to it + 1 for use later on. 
+    statement = connection.createStatement();
+    resultSet = statement.executeQuery("SELECT MAX(PID) FROM Person");
+    System.out.println("statement: " +statement.toString());
+    if(!resultSet.next()) 
     {
       JOptionPane.showMessageDialog(null,"No records found!");
       return;
     }
-    else 
+    else
     {
-      // columnNames holds the column names of the query result      
-      Vector<Object> columnNames = new Vector<Object>(); 
-      // rows is a vector of vectors, each vector is a vector of
-      // values representing a certain row of the query result
-      Vector<Object> rows = new Vector<Object>();
-      // get column headers
-      doQuerymetaData = doQueryresultSet.getMetaData();
-      for(int i = 1; i <= doQuerymetaData.getColumnCount(); ++i)
-         columnNames.addElement(doQuerymetaData.getColumnLabel(i));
-      // get row data
-      do 
-      {
-         Vector<Object> currentRow = new Vector<Object>();
-         for(int i = 1; i <= doQuerymetaData.getColumnCount(); ++i)
-            currentRow.addElement(doQueryresultSet.getObject(i));
-         rows.addElement(currentRow);
-      } 
-      while(doQueryresultSet.next()); //moves cursor to next record
-            
-      if(scroller!=null)
-         getContentPane().remove(scroller);
-
-      // display table with ResultSet contents
-      table = new JTable(rows, columnNames);
-      table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), 10*table.getRowHeight()));
-      scroller = new JScrollPane(table);
-      getContentPane().add(scroller,BorderLayout.SOUTH);
-      validate();
+     maxPid = resultSet.getInt(1) + 1;
     }
+    statement.close();
+
+//-------------------------------------------------------------------------------------------------------------------------------
+    // Inserts the Newly Created person into the persons table with a new pid and the username provided
+    pstmt       = connection.prepareStatement(" INSERT INTO Person(pid, pname) VALUES (?, ?);");
+    pstmt.setInt(1,maxPid);
+    pstmt.setString(2, userNameField.getText().trim());//pname
+    System.out.println("userNameField "+userNameField.getText().trim());
+    System.out.println("pstmt: " +pstmt.toString());
+    System.out.println("About to Execute");
+    pstmt.execute();
+//-------------------------------------------------------------------------------------------------------------------------------
+    // Inserts the Newly Created user into the persons table
+    pstmt.clearParameters();
+    pstmt       = connection.prepareStatement(" INSERT INTO User(pid, email, is_admin, rental_quota, user_password) VALUES (?, ?, 0, ?, ?);");
+    pstmt.setInt(1,maxPid);
+
+    pstmt.setString(2, emailField.getText().trim());//email
+    System.out.println("emailField " + emailField.getText().trim());
+
+    pstmt.setInt(3, Integer.parseInt(quotaField.getText().trim()));//rental_quota
+    System.out.println("quotaField "+ quotaField.getText().trim());
+
+    pstmt.setString(4, new String(pwdField.getPassword()));//user_password
+    System.out.println("pwdField "+ new String(pwdField.getPassword()));
+    
+    System.out.println("pstmt: " +pstmt.toString());
+    System.out.println("About to Execute");
+    pstmt.execute();
+
+//-------------------------------------------------------------------------------------------------------------------------------
+    // And here's where id keep my Addresses, IF I HAD ANYYY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    pstmt.clearParameters();
+    //System.out.println("pstmt: " +pstmt.toString());
+    //pstmt       = connection.prepareStatement(" INSERT INTO User(pid, email, is_admin, rental_quota, user_password) VALUES (?, ?, 0, ?, ?);");
+    //pstmt.setString(6, userData.elementAt(0).toString());
+    //pstmt.setString(7, userData.elementAt(0).toString());
+    //pstmt.setString(8, userData.elementAt(0).toString());
+    //pstmt.setString(9, userData.elementAt(0).toString());
+    //System.out.println("pstmt: " +pstmt.toString());
+    //System.out.println("About to Execute");
+    //pstmt.execute();
+
     pstmt.close();
   }//end of try
   catch(SQLException ex) 
   {
-   JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
+    System.out.println(ex.getMessage());
+    JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
   }
-}// END OF DO QUERY
-/*public static void main(String args[])
-{ 
-   CreateUserDialog db = new CreateUserDialog();
-} */
+  catch (NumberFormatException nfe)
+  {
+    JOptionPane.showMessageDialog(this,"Please make sure data in either the zip field or the quotaField is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
+  }
+}// END OF createUserQueryExecuter
 }//END OF CLASS

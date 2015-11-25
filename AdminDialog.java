@@ -15,6 +15,7 @@ public class AdminDialog extends JDialog
    private JButton            createButton;
    private JButton            deleteButton;
    private JButton            displayButton;
+   private JButton            returnButton;
    
    private JRadioButton       userButton;
    private JRadioButton       rentalButton;
@@ -58,6 +59,12 @@ public class AdminDialog extends JDialog
       deleteButton.setActionCommand("DELETE");
       deleteButton.addActionListener(this);
       buttonSelectionPanel.add(deleteButton);
+
+
+      returnButton   = new JButton("Return");
+      returnButton.setActionCommand("RETURN");
+      returnButton.addActionListener(this);
+      buttonSelectionPanel.add(returnButton);
      
       userButton       = new JRadioButton("Members");
       userButton.setActionCommand("USER");
@@ -169,6 +176,10 @@ public void actionPerformed(ActionEvent e)
    else if(e.getActionCommand().equals("DELETE") && rentalButton.isSelected())
    {
       System.out.println("DELETERental");
+   }
+   else if(e.getActionCommand().equals("RETURN") && rentalOutButton.isSelected())
+   {
+      System.out.println("RETURN RETURN");
    }   
 }//end of action performed
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,10 +187,15 @@ void buttonUpdater()
 {
     createButton.setEnabled(false);
     deleteButton.setEnabled(false);
+    returnButton.setEnabled(false);
     if(userButton.isSelected()||rentalButton.isSelected())
     {
       createButton.setEnabled(true);
       deleteButton.setEnabled(true);
+    }
+    else if (rentalOutButton.isSelected())
+    {
+        returnButton.setEnabled(true);
     }
 }        
 
