@@ -37,7 +37,7 @@ public class AdminDialog extends JDialog
    public AdminDialog(Connection newConnection)
    {
       setLayout(new FlowLayout(FlowLayout.CENTER));
-      connection              = newConnection;
+      connection                = newConnection;
       topPanel                  = new JPanel();
       radiobuttonSelectionPanel = new JPanel();
       buttonSelectionPanel      = new JPanel();
@@ -121,15 +121,19 @@ public void actionPerformed(ActionEvent e)
    }
    else if(e.getActionCommand().equals("DISPLAY") && userButton.isSelected())
    {
-      System.out.println("Display Users");
+      tmp = "SELECT * FROM moviestore.user;";
+      this.doQuery(tmp);
    }
    else if(e.getActionCommand().equals("DISPLAY") && rentalButton.isSelected())
    {
-      System.out.println("DisplayRentals rentalButton");
+      tmp = "SELECT * FROM moviestore.rentals;";
+      this.doQuery(tmp);
    }
    else if(e.getActionCommand().equals("DISPLAY") && rentalOutButton.isSelected())
    {
       System.out.println("Display rentalOutButton");
+      tmp = "SELECT * FROM rentals_record_rents rrr Where rrr.return_Date is null ;";
+      this.doQuery(tmp);
    }
    else if(e.getActionCommand().equals("DISPLAY") && topTenButton.isSelected())
    {
