@@ -211,6 +211,8 @@ void createUserQueryExecuter()
     pstmt.execute();
 //-------------------------------------------------------------------------------------------------------------------------------
     pstmt.close();
+    System.out.println("LEAVING");
+    JOptionPane.showMessageDialog(null, "hey kid it looks like newly created user went through, thats great...", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
   }//end of try
   catch(SQLException ex) 
   {
