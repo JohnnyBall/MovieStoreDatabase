@@ -24,7 +24,6 @@ public class DatabaseGui extends JFrame
    private JButton          rentButton;
    private JButton          logoutButton;
 
-
    private JRadioButton     castButton;
    private JRadioButton     directorButton;
    private JRadioButton     genreButton;
@@ -75,20 +74,19 @@ public class DatabaseGui extends JFrame
       moviesButton               = new JRadioButton("movies",true);
       keywordsButton             = new JRadioButton("keywords");
       dontShowRentedBeforeButton = new JRadioButton("no previous rentals");
-
+      
       gamesOrMoviesButtonGroup   = new ButtonGroup();
       gamesSelectionButtonGroup  = new ButtonGroup();
       moviesSelectionButtonGroup = new ButtonGroup();
-
-      buttonUpdater();
       
-      userInfoButton        = new JButton("Create User");
-      rentButton            = new JButton("Rent");
-      loginButton           = new JButton("Login");
-      sequelButton          = new JButton("Display Sequels");
-      displayAwardsButton   = new JButton("Display Awards");
-      adminButton           = new JButton("Admin Info");
-      logoutButton          = new JButton("Logout");
+      userInfoButton             = new JButton("Create User");
+      rentButton                 = new JButton("Rent");
+      loginButton                = new JButton("Login");
+      sequelButton               = new JButton("Display Sequels");
+      displayAwardsButton        = new JButton("Display Awards");
+      adminButton                = new JButton("Admin Info");
+      logoutButton               = new JButton("Logout");
+      buttonUpdater();
       sequelButton.setEnabled(false);
       rentButton.setEnabled(false);   
       displayAwardsButton.setEnabled(false);  
@@ -185,8 +183,8 @@ public class DatabaseGui extends JFrame
   {
     Toolkit   tk = Toolkit.getDefaultToolkit();
     Dimension d  = tk.getScreenSize();
-    this.setSize(850, 500);
-    this.setMinimumSize(new Dimension(850, 500));
+    this.setSize(900, 500);
+    this.setMinimumSize(new Dimension(900, 500));
     this.setLocation(d.width/4, d.height/4);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setTitle("MOVIE'S R US");

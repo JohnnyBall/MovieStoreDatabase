@@ -14,6 +14,7 @@ public class CreateRentalDialog extends JDialog
 
    private JPanel            topPanel;
    private JPanel            buttonPanel;
+   
    private JTable            table;
    private Connection        connection;
    private DBHandler         dbhandler;
@@ -45,20 +46,30 @@ public class CreateRentalDialog extends JDialog
    private JTextField        awardsField;
 
 
+   private JSpinner          dateSpinner;
+   private SpinnerDateModel  datemodel;
+   private JComponent        spinEditor;
+
    public CreateRentalDialog(Connection newConnection)
    {
       connection               = newConnection;
       topPanel                 = new JPanel();
       buttonPanel              = new JPanel();
       dbhandler                = new DBHandler();
+
+      datemodel                = new SpinnerDateModel();
+      dateSpinner              = new JSpinner(datemodel);
+      spinEditor               = new JSpinner.DateEditor(dateSpinner,"yyyy-MM-dd");
       
+      dateSpinner.setEditor(spinEditor);
+
       gamesButton              = new JRadioButton("games");
       moviesButton             = new JRadioButton("movies",true);
       
       gamesOrMoviesButtonGroup = new ButtonGroup();
       gamesOrMoviesButtonGroup.add(moviesButton);
       gamesOrMoviesButtonGroup.add(gamesButton);
-
+      
       submitButton             = new JButton("Submit");
 
       submitButton.setActionCommand("SUBMIT");
@@ -75,31 +86,28 @@ public class CreateRentalDialog extends JDialog
       moviesButton.addActionListener(this);
       gamesButton.addActionListener(this);
 
-      
-
       getRootPane().setDefaultButton(submitButton);
       
       
-      titleLabel               = new JLabel("Title:");
-      amountLabel              = new JLabel("Number of Available Copy's:");
-      releaseDateLabel         = new JLabel("ReleaseDate: ");
-      genreLabel               = new JLabel("Genre: ");
-      platformLabel            = new JLabel("Platform: ");
-      castMemberLabel          = new JLabel("CastMember(s): ");
-      directorLabel            = new JLabel("Director: ");
-      sequelLabel              = new JLabel("Sequal: ");
-      awardsLabel              = new JLabel("Awards Won: ");
+      titleLabel       = new JLabel("Title:");
+      amountLabel      = new JLabel("Number of Available Copy's:");
+      releaseDateLabel = new JLabel("ReleaseDate(yyyy-mm-dd): ");
+      genreLabel       = new JLabel("Genre: ");
+      platformLabel    = new JLabel("Platform: ");
+      castMemberLabel  = new JLabel("CastMember(PID): ");
+      directorLabel    = new JLabel("Director(PID): ");
+      sequelLabel      = new JLabel("Sequal(RID): ");
+      awardsLabel      = new JLabel("Awards Won: ");
       
-      
-      titleField               = new JTextField();
-      amountField              = new JTextField();
-      releaseDateField         = new JTextField();
-      genreField               = new JTextField();
-      platFormField            = new JTextField();
-      directorField            = new JTextField();
-      castMemberField          = new JTextField();
-      prequelField              = new JTextField();
-      awardsField              = new JTextField();
+      titleField       = new JTextField();
+      amountField      = new JTextField();
+      //releaseDateField = new JTextField("This doesnt work fully either, its just there for looks until i fix it");
+      genreField       = new JTextField();
+      platFormField    = new JTextField();
+      directorField    = new JTextField();
+      castMemberField  = new JTextField("this will only add one member as of now...");
+      prequelField     = new JTextField();
+      awardsField      = new JTextField();
 
       topPanel.setLayout(new GridLayout(18,2,0,5));
       
@@ -110,7 +118,7 @@ public class CreateRentalDialog extends JDialog
       topPanel.add(amountField);
       
       topPanel.add(releaseDateLabel);
-      topPanel.add(releaseDateField);
+      topPanel.add(dateSpinner);
 
       topPanel.add(genreLabel);
       topPanel.add(genreField);
@@ -132,7 +140,7 @@ public class CreateRentalDialog extends JDialog
 
       add(topPanel,BorderLayout.CENTER);      
       
-      add(buttonPanel,BorderLayout.NORTH);
+      add(buttonPanel,BorderLayout.SOUTH);
 
       getRootPane().setDefaultButton(submitButton);
       this.setupMainFrame();
@@ -162,7 +170,7 @@ public void actionPerformed(ActionEvent e)
   }
   else if(e.getActionCommand().equals("SUBMIT"))
   {
-    if (gamesButton.isSelected() && !(titleField.getText().trim().equals("")) && !(amountField.getText().trim().equals("")) && !(releaseDateField.getText().trim().equals("")) && !(genreField.getText().trim().equals("")) && !(platFormField.getText().trim().equals("")))
+    if (gamesButton.isSelected() && !(titleField.getText().trim().equals("")) && !(amountField.getText().trim().equals("")) && !(genreField.getText().trim().equals("")) && !(platFormField.getText().trim().equals("")))
     {
       try
       {
@@ -174,7 +182,7 @@ public void actionPerformed(ActionEvent e)
         JOptionPane.showMessageDialog(this,"Please make sure data in either the zip field or the quotaField is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
       }
     }
-    else if(moviesButton.isSelected() && !(titleField.getText().trim().equals("")) && !(amountField.getText().trim().equals("")) && !(releaseDateField.getText().trim().equals("")) && !(genreField.getText().trim().equals("")) && !(directorField.getText().trim().equals("")))
+    else if(moviesButton.isSelected() && !(titleField.getText().trim().equals("")) && !(amountField.getText().trim().equals(""))  && !(genreField.getText().trim().equals("")) && !(directorField.getText().trim().equals("") && !(castMemberField.getText().trim().equals(""))))
     {
       try
       {
@@ -238,11 +246,11 @@ void createRentalQueryExecuter()
 //-------------------------------------------------------------------------------------------------------------------------------
     //
     //pstmt = connection.prepareStatement("INSERT rentals (rid,title,releaseDate,num_availible_copys) VALUES (?, ?, ?, ?);");////////////////////////////////////////FIX 
-    pstmt = connection.prepareStatement("INSERT rentals (rid, title, releaseDate, num_availible_copys) VALUES (?, ?,CURDATE(), ?);");////////////////////////////////////////FIX
+    pstmt = connection.prepareStatement("INSERT rentals (rid, title, releaseDate, num_availible_copys) VALUES (?, ?, ?, ?);");////////////////////////////////////////FIX
     pstmt.setInt(1,maxRID);
     pstmt.setString(2, titleField.getText().trim());//pname
-    pstmt.setInt(3, Integer.parseInt(amountField.getText().trim()));// sets amountField  of available copys int
-    //pstmt.setDate(3, new Date(releaseDateField.getText().trim()))///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    pstmt.setDate(3, new java.sql.Date(datemodel.getDate().getTime()));///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    pstmt.setInt(4, Integer.parseInt(amountField.getText().trim()));// sets amountField  of available copys int
     System.out.println("titleField "+ titleField.getText().trim());
     System.out.println("pstmt: " + pstmt.toString());
     System.out.println("About to Execute RENTAL INSERT");
@@ -259,7 +267,6 @@ void createRentalQueryExecuter()
 //-------------------------------------------------------------------------------------------------------------------------------
     if(moviesButton.isSelected())
     {
-//-------------------------------------------------------------------------------------------------------------------------------
        // 
         pstmt.clearParameters();
         pstmt = connection.prepareStatement("INSERT movie (rid, pid, rid_of_prequel) VALUES (?, ?, ?);");
@@ -276,16 +283,16 @@ void createRentalQueryExecuter()
         pstmt.execute();
 //-------------------------------------------------------------------------------------------------------------------------------
        // AND HERES WHERE  I WOULD PUT MY CAST MEMBERS, IF I HAD ANY!!!!!!!!!!!!!!!!!!!!!! 
-        if(!castMemberField.getText().trim().equals(""))// checks to see if castMemberField is blank
-        {
+        //if(!castMemberField.getText().trim().equals(""))// checks to see if castMemberField is blank
+        //{
           pstmt.clearParameters();
           pstmt = connection.prepareStatement("INSERT was_in(pid,rid) VALUES (?, ?);");
-          pstmt.setInt(1,maxRID);
-          pstmt.setInt(2, Integer.parseInt(castMemberField.getText().trim()));///////////////////////////////////////MAY NEED TO PARSE AND STRING/loop and choop
+          pstmt.setInt(1, Integer.parseInt(castMemberField.getText().trim()));///////////////////////////////////////MAY NEED TO PARSE AND STRING/loop and choop
+          pstmt.setInt(2,maxRID);
           System.out.println("pstmt: " + pstmt.toString());
           System.out.println("About to ExecuteINSERT movie");
           pstmt.execute();
-       }
+      // }
 //-------------------------------------------------------------------------------------------------------------------------------
         //
         if(!awardsField.getText().trim().equals(""))// checks to see if award textfield is blank
@@ -302,7 +309,6 @@ void createRentalQueryExecuter()
     }
     else if(gamesButton.isSelected())
     {    
-//-------------------------------------------------------------------------------------------------------------------------------
        // 
         pstmt.clearParameters();
         pstmt = connection.prepareStatement("INSERT game (rid) VALUE (?);");
@@ -319,11 +325,10 @@ void createRentalQueryExecuter()
         System.out.println("pstmt: " + pstmt.toString());
         System.out.println("About to Execute INSERT movie");
         pstmt.execute();
-//-------------------------------------------------------------------------------------------------------------------------------
     }
     pstmt.close();
     System.out.println("LEAVING");
-    JOptionPane.showMessageDialog(null, "hey kid it looks like newly created user went through, thats great...", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
+    JOptionPane.showMessageDialog(null, "Your rental has been entered into the database, please refresh your table to see results!", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
   }//end of try
   catch(SQLException ex) 
   {

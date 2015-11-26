@@ -98,8 +98,8 @@ public class CreateUserDialog extends JDialog
       editButton.setActionCommand("EDIT");
       editButton.addActionListener(this);
       buttonPanel.add(editButton);
-      add(topPanel,BorderLayout.NORTH);      
-      add(buttonPanel,BorderLayout.CENTER);
+      add(topPanel,BorderLayout.CENTER);      
+      add(buttonPanel,BorderLayout.SOUTH);
 
       getRootPane().setDefaultButton(editButton);
       this.setupMainFrame();
