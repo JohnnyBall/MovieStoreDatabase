@@ -190,7 +190,7 @@ void createUserQueryExecuter()
     // And here's where id keep my Addresses, IF I HAD ANYYY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Have some addresses now, here they are, they will make it so that users rentals can be shipped to them, isnt that nice?!
     pstmt.clearParameters();
-    pstmt = connection.prepareStatement("INSERT address(street, zip, phone, state, city) VALUES(?, ?, ?, ?, ?);");
+    pstmt = connection.prepareStatement("INSERT IGNORE address(street, zip, phone, state, city) VALUES(?, ?, ?, ?, ?);");
     pstmt.setString(1, addressField.getText().trim());//sets address
     pstmt.setInt(2, Integer.parseInt(zipField.getText().trim()));// sets zipcode int
     pstmt.setString(3, phoneField.getText().trim());// sets phone number
