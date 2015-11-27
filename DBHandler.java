@@ -36,12 +36,6 @@ public class DBHandler
                          "FROM rentals ar " +
                          "WHERE ar.rid IN (";
 
-//EXAMPLE OF CREATE VIEW FOR WHEN ITS NEEDED
-/*CREATE OR REPLACE view  search as 
-SELECT DISTINCT mgr.rid  
-FROM  rentals mgr, belongs_to_genre mgb, movie mg  
-WHERE mgb.gName like '%drama%' AND mgb.rid = mg.rid AND mg.rid = mgr.rid;*/
-
         acquireResults2ElectricBugalooMovies = //"SELECT DISTINCT Rental1.rid as Rental_Id , Rental1.title as RentalTitle, Rental1.releaseDate as ReleaseDate, Rental1.num_availible_copys as AmountAvaliable, Genr.Genres,CastMember.CastMembers, Director.Director,AwardTi.AwardTitles  FROM "+
                                                "SELECT DISTINCT Rental1.rid as Rental_Id , Rental1.title as RentalTitle, Rental1.releaseDate as ReleaseDate, Rental1.num_availible_copys as AmountAvaliable, Genr.Genres,CastMember.CastMembers, Director.Director " +
                                                //"IF(Rental1.rid = ANY(AwardTi.rid), AwardTi.AwardTitles, 'None') " +
@@ -68,13 +62,6 @@ WHERE mgb.gName like '%drama%' AND mgb.rid = mg.rid AND mg.rid = mgr.rid;*/
                                                //"group by rawd.rid) as AwardTi "+
                                                //"where Rental1.rid = AwardTi.rid and AwardTi.rid = Genr.rid  and Genr.rid = Director.rid and  Director.rid  = CastMember.rid; ";
                                                "where Rental1.rid = Genr.rid and Genr.rid = Director.rid and Director.rid  = CastMember.rid; ";
-
-
-//EXAMPLE OF CREATE VIEW FOR WHEN ITS NEEDED
-/*CREATE OR REPLACE view  search as 
-SELECT DISTINCT mgr.rid  
-FROM  rentals mgr, belongs_to_genre mgb, game mg  
-WHERE mgb.gName like '%first person shooter%' AND mgb.rid = mg.rid AND mg.rid = mgr.rid;*/
 
         acquireResults2ElectricBugalooGames = "SELECT DISTINCT Rental1.rid as RentalId , Rental1.title as RentalTitle, Rental1.releaseDate as ReleaseDate, Rental1.num_availible_copys as AmmountAvaliable, Genr.Genres,plat.Platforms "+  
                                               "FROM( "+
@@ -169,7 +156,7 @@ WHERE mgb.gName like '%first person shooter%' AND mgb.rid = mg.rid AND mg.rid = 
                                                 "FROM rentals_record_rents rrrl, rentals rl, user ul " +
                                                 "WHERE ul.pid = ? AND rrrl.rid = rl.rid AND ul.pid = rrrl.pid)";
 
-        accountDetails = "SELECT DISTINCT r.rid, r.title,r.releaseDate,rrr.Trackingnum,rrr.from_date " +
+        accountDetails = "SELECT DISTINCT r.rid, r.title,r.releaseDate,rrr.Trackingnum,rrr.from_date,rrr.return_Date " +
                          "FROM rentals_record_rents rrr, rentals r, user u " +
                          "WHERE u.pid = ?  AND rrr.rid = r.rid AND u.pid = rrr.pid";
 
@@ -188,5 +175,4 @@ WHERE mgb.gName like '%first person shooter%' AND mgb.rid = mg.rid AND mg.rid = 
         Class.forName(JDBC_DRIVER);
         return DriverManager.getConnection(DATABASE_URL, USER, PASS);
     }
-
 }

@@ -432,7 +432,6 @@ public void actionPerformed(ActionEvent e)
         }
       }//end of gamesButton.isSelected()
    }//END OF SEARCH ELSE
-   
    else if(e.getActionCommand().equals("SEQUEL"))
    {
        int               ridHolder;
@@ -556,7 +555,6 @@ public void actionPerformed(ActionEvent e)
         }
        }
    }
-   
    else if(e.getActionCommand().equals("AWARDS"))
    {
        int ridHolder;
@@ -573,6 +571,55 @@ public void actionPerformed(ActionEvent e)
        
        new AwardDialog(connection, titleHolder, ridHolder);
        }
+   }
+   else if((e.getActionCommand().equals("RENT")))
+   {
+       int               ridHolder;
+       int               maxTrackingNumber;
+       String            titleHolder;
+       PreparedStatement pstmt;
+       try 
+       {
+         if(table.getSelectedRow() == -1)
+         {
+            JOptionPane.showMessageDialog(null,"Nothing seems to be selected!");
+         }
+         else
+         {
+           statement = connection.createStatement();
+           resultSet = statement.executeQuery("SELECT MAX(Trackingnum) FROM Rentals_Record_Rents");
+           System.out.println("statement: " +statement.toString());
+           if(!resultSet.next()) 
+           {
+             JOptionPane.showMessageDialog(null,"No records found!");
+             return;
+           }
+           else
+           {
+             maxTrackingNumber = resultSet.getInt(1) + 1;
+           }
+           statement.close();
+           //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+           ridHolder   = (int)table.getValueAt(table.getSelectedRow(), 0);
+           titleHolder = (String)table.getValueAt(table.getSelectedRow(), 1);
+           pstmt       = connection.prepareStatement("INSERT Rentals_Record_Rents(rid,pid,Trackingnum,from_Date) VALUES(?, ?, ?, CURDATE());");
+           pstmt.setInt(1, ridHolder);
+           pstmt.setInt(2, (int)userData.elementAt(0));
+           pstmt.setInt(3, maxTrackingNumber);
+           System.out.println("pstmt: " + pstmt.toString());
+           System.out.println("About to Execute UPDATE on rentals_record_rents RENTING UR THING");
+           pstmt.execute();
+           JOptionPane.showMessageDialog(null, "The rental you selected has been returned, please refresh your table to see results!", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
+           //JOptionPane.showMessageDialog(null, "hey kid it looks like newly created user went through, thats great...", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
+           pstmt.close();
+           System.out.println("DONE!");
+          }
+        }
+        catch(SQLException ex) 
+        {
+          System.out.println(ex.getMessage());
+          JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
+        }
    }
 }//END OF ACTION PERFORMED
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

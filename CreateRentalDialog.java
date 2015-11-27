@@ -37,7 +37,6 @@ public class CreateRentalDialog extends JDialog
 
    private JTextField        titleField;
    private JTextField        amountField;
-   private JTextField        releaseDateField;
    private JTextField        genreField;
    private JTextField        platFormField;
    private JTextField        directorField;
@@ -101,7 +100,6 @@ public class CreateRentalDialog extends JDialog
       
       titleField       = new JTextField();
       amountField      = new JTextField();
-      //releaseDateField = new JTextField("This doesnt work fully either, its just there for looks until i fix it");
       genreField       = new JTextField();
       platFormField    = new JTextField();
       directorField    = new JTextField();
