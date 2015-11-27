@@ -5,20 +5,25 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-public class UserInfoDialog extends JDialog
-                                 implements ActionListener
+public class UserInfoDialog extends JDialog implements ActionListener
 {
-
    private Vector<Object>    userInfo;
    private Vector<Object>    addressInfo;
-   private Vector<Object>    editInfo;
+   //private Vector<Object>    editInfo;
+
    public  JButton           refreshButton;
    public  JButton           editButton;
+
    private JPanel            topPanel;
    private JPanel            buttonPanel;
+   private String            usersName;
+
    private JTable            table;
+
    private JScrollPane       scroller;
+
    private Connection        connection;
+
    private JLabel            userInfoLabel;
    private JLabel            userNameLabel;
    private JLabel            emailLabel;
@@ -29,7 +34,7 @@ public class UserInfoDialog extends JDialog
    private JLabel            cityLabel;
    private JLabel            zipLabel;
    private JLabel            phoneLabel;
-   private DBHandler         dbhandler;
+   
    private JTextField        userNameField;
    private JTextField        addressField;
    private JTextField        stateField;
@@ -39,22 +44,25 @@ public class UserInfoDialog extends JDialog
    private JTextField        emailField;
    private JTextField        quotaField;
    private JPasswordField    pwdField;
+
    private ResultSet         doQueryresultSet;
    private ResultSetMetaData doQuerymetaData;
    private PreparedStatement pstmt;
-
+   private DBHandler         dbhandler;
+   private ResultSet         resultSet;
+   private ResultSetMetaData metaData;
+   private Statement         statement;
 
    public UserInfoDialog(Connection newConnection,Vector<Object> userInfo)
    {
-      
       try
       {
+      this.userInfo = userInfo;
+      connection    = newConnection;
       topPanel      = new JPanel();
       buttonPanel   = new JPanel();
       dbhandler     = new DBHandler();
-      this.userInfo = userInfo;
       addressInfo   = new Vector<Object>();
-      connection    = newConnection;
       refreshButton = new JButton("REFRESH");
       editButton    = new JButton("Submit Detail Edits");
       userNameLabel = new JLabel("User's Name: ");
@@ -75,6 +83,7 @@ public class UserInfoDialog extends JDialog
       quotaField    = new JTextField();
       pwdLabel      = new JLabel("Change Password: ");
       pwdField      = new JPasswordField();
+
       quotaField.setEditable(false);
       refreshButton.setVisible(false);
       refreshButton.setActionCommand("REFRESH");
@@ -82,73 +91,51 @@ public class UserInfoDialog extends JDialog
 
       topPanel.setLayout(new GridLayout(18,2,0,5));
 
-      if(userInfo.size() != 0)
+
+//THIS SHOULD BE A METHOD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
+      pstmt = connection.prepareStatement(dbhandler.personNameSearch);
+      System.out.println("running this Query:"+dbhandler.personNameSearch);
+      pstmt.clearParameters();
+      pstmt.setString(1, userInfo.elementAt(0).toString());
+      doQueryresultSet = pstmt.executeQuery();
+      if(!doQueryresultSet.next()) 
       {
-//THIS SHOULD BE A METHOD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////             
-        pstmt = connection.prepareStatement(dbhandler.personNameSearch);
-        System.out.println("running this Query:"+dbhandler.personNameSearch);
-        pstmt.clearParameters();
-        pstmt.setString(1, userInfo.elementAt(0).toString());
-        doQueryresultSet = pstmt.executeQuery();
-        if(!doQueryresultSet.next()) 
-        {
-          JOptionPane.showMessageDialog(null,"No records found!");
-          return;
-        }
-        else
-        {
-          userNameField.setText(doQueryresultSet.getObject(1).toString());
-        }        
-        pstmt.close();
-        
-        pstmt = connection.prepareStatement(dbhandler.addressSearch);
-        pstmt.clearParameters();
-        pstmt.setInt(1, (int)userInfo.elementAt(0));
-        doQueryresultSet = pstmt.executeQuery();
-        if(!doQueryresultSet.next())
-        {
-            JOptionPane.showMessageDialog(null,"No records found!");
-            return;
-        }
-        else
-        {
-            for(int i = 1; i <= doQueryresultSet.getMetaData().getColumnCount(); ++i)
-                addressInfo.addElement(doQueryresultSet.getObject(i));
-        }
-        
-        pstmt.close();
-        
-        addressField.setText((String)addressInfo.elementAt(0));
-        cityField.setText((String)addressInfo.elementAt(1));
-        stateField.setText((String)addressInfo.elementAt(2));
-        zipField.setText(addressInfo.elementAt(3).toString());
-        phoneField.setText(addressInfo.elementAt(4).toString());
-
-//THIS SHOULD ALSO BE A METHOD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
-/*        pstmt = connection.prepareStatement(dbhandler.addressSearch);
-        System.out.println("running this Query:"+dbhandler.addressSearch);
-        pstmt.clearParameters();
-        pstmt.setString(1, userInfo.elementAt(0).toString());
-        doQueryresultSet = pstmt.executeQuery();
-        if(!doQueryresultSet.next()) 
-        {
-          JOptionPane.showMessageDialog(null,"No records found!");
-          return;
-        }
-        else
-        {
-          userNameField.setText(doQueryresultSet.getObject(1).toString());
-        }
-          pstmt.close();*/
-
-
-
-        emailField.setText(userInfo.elementAt(1).toString());
-        quotaField.setText(userInfo.elementAt(3).toString());
-        pwdField.setText(userInfo.elementAt(4).toString());
-        refreshButton.setVisible(true);
-        
+        JOptionPane.showMessageDialog(null,"No records found!");
+        return;
       }
+      else
+      {
+        usersName = doQueryresultSet.getObject(1).toString();
+        userNameField.setText(usersName);
+      }        
+      pstmt.close();
+      pstmt = connection.prepareStatement(dbhandler.addressSearch);
+      pstmt.clearParameters();
+      pstmt.setInt(1, (int)userInfo.elementAt(0));
+      doQueryresultSet = pstmt.executeQuery();
+      if(!doQueryresultSet.next())
+      {
+          JOptionPane.showMessageDialog(null,"No records found!");
+          return;
+      }
+      else
+      {
+          for(int i = 1; i <= doQueryresultSet.getMetaData().getColumnCount(); ++i)
+              addressInfo.addElement(doQueryresultSet.getObject(i));
+      }
+      pstmt.close();
+
+      addressField.setText((String)addressInfo.elementAt(0));
+      cityField.setText((String)addressInfo.elementAt(1));
+      stateField.setText((String)addressInfo.elementAt(2));
+
+      zipField.setText(addressInfo.elementAt(3).toString());
+      phoneField.setText(addressInfo.elementAt(4).toString());
+      emailField.setText(userInfo.elementAt(1).toString());
+      quotaField.setText(userInfo.elementAt(3).toString());
+      pwdField.setText(userInfo.elementAt(4).toString());
+
+      refreshButton.setVisible(true);
 
       topPanel.add(userNameLabel);
       topPanel.add(userNameField);
@@ -171,23 +158,13 @@ public class UserInfoDialog extends JDialog
 
       buttonPanel.add(refreshButton);
       buttonPanel.add(editButton);
+      editButton.setActionCommand("EDIT");
+      editButton.addActionListener(this);
       add(topPanel,BorderLayout.NORTH);      
       add(buttonPanel,BorderLayout.CENTER);
 
       getRootPane().setDefaultButton(refreshButton);
-      this.setupMainFrame();
-      editInfo = new Vector<Object>();
-      
-      editInfo.addElement(userNameField.getText());
-      editInfo.addElement(addressField.getText());
-      editInfo.addElement(cityField.getText());
-      editInfo.addElement(stateField.getText());
-      editInfo.addElement(zipField.getText());
-      editInfo.addElement(phoneField.getText());
-      editInfo.addElement(emailField.getText());
-      editInfo.addElement(quotaField.getText());
-      editInfo.addElement(new String(pwdField.getPassword()));
-      
+      this.setupMainFrame();      
       }
       catch(SQLException ex) 
       {
@@ -217,49 +194,76 @@ public void actionPerformed(ActionEvent e)
   
   else if(e.getActionCommand().equals("EDIT"))
   {
-      if(!(editInfo.elementAt(0).toString().equals(userNameField.getText().trim())) && !(userNameField.getText().trim().equals("")))
-      {
-          editInfo.addElement(userNameField.getText().trim());
-      }
-      
-      if(!(editInfo.elementAt(1).toString().equals(addressField.getText().trim())) && !(addressField.getText().trim().equals("")))
-      {
-          editInfo.addElement(addressField.getText().trim());
-      }
-      
-      if(!(editInfo.elementAt(2).toString().equals(cityField.getText().trim())) && !(cityField.getText().trim().equals("")))
-      {
-          editInfo.addElement(cityField.getText().trim());
-      }
-      
-      if(!(editInfo.elementAt(3).toString().equals(stateField.getText().trim())) && !(stateField.getText().trim().equals("")))
-      {
-          editInfo.addElement(stateField.getText().trim());
-      }
-      
-      if(!(editInfo.elementAt(4).toString().equals(zipField.getText().trim())) && !(zipField.getText().trim().equals("")))
-      {
-          editInfo.addElement(zipField.getText().trim());
-      }
-      
-      if(!(editInfo.elementAt(5).toString().equals(phoneField.getText().trim())) && !(phoneField.getText().trim().equals("")))
-      {
-          editInfo.addElement(phoneField.getText().trim());
-      }
-      
-      if(!(editInfo.elementAt(6).toString().equals(emailField.getText().trim())) && !(emailField.getText().trim().equals("")))
-      {
-          editInfo.addElement(emailField.getText().trim());
-      }
-      
-      if(!(editInfo.elementAt(8).toString().equals(new String(pwdField.getPassword()).trim())) && !(new String(pwdField.getPassword()).trim().equals("")))
-      {
-          editInfo.addElement(new String(pwdField.getPassword()).trim());
-      }
-      
-      //Values in editInfo should be ready to send in a transaction to update userInfo
+     updateUserQueryExecuter();
   }
 }//end of action performed
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void updateUserQueryExecuter()
+{
+  try 
+  {
+//-------------------------------------------------------------------------------------------------------------------------------
+    // 
+        usersName = userNameField.getText().trim();
+        pstmt     = connection.prepareStatement("UPDATE  IGNORE Person SET pname = ? WHERE pid = ?;");
+        pstmt.setString(1,usersName);
+        pstmt.setInt(2, (int)userInfo.elementAt(0));
+        System.out.println("userName " + usersName);
+        System.out.println("pstmt: "   + pstmt.toString());
+        System.out.println("About to Execute UPDATE PERSONS NAME");
+        pstmt.execute();
+//-------------------------------------------------------------------------------------------------------------------------------
+    //
+        userInfo.set(1,emailField.getText().trim());
+        userInfo.set(4,new String(pwdField.getPassword()).trim());
+
+        pstmt     = connection.prepareStatement("UPDATE IGNORE User SET email = ? , user_password = ? WHERE pid = ?;");
+        pstmt.setString(1,userInfo.elementAt(1).toString());
+        pstmt.setString(2,userInfo.elementAt(4).toString());
+        pstmt.setInt(3, (int)userInfo.elementAt(0));
+
+        System.out.println("userName " + usersName);
+        System.out.println("pstmt: "   + pstmt.toString());
+        System.out.println("About to Execute UPDATE USERS INFO!!!!!!!!");
+        pstmt.execute();
+//-------------------------------------------------------------------------------------------------------------------------------
+    //
+        pstmt = connection.prepareStatement(" UPDATE IGNORE address "
+                                          + " SET street   = ? , zip = ? , state = ? , phone = ? , city = ?"
+                                          + " WHERE street = (SELECT hs.street FROM has_address hs WHERE hs.pid = ?);");
+
+        addressInfo.set(0,addressField.getText().trim());
+        addressInfo.set(1,cityField.getText().trim());
+        addressInfo.set(2,stateField.getText().trim());
+        addressInfo.set(3,zipField.getText().trim());
+        addressInfo.set(4,phoneField.getText().trim());
+
+        pstmt.setString(1,addressInfo.elementAt(0).toString());
+        pstmt.setInt(2, Integer.parseInt(addressInfo.elementAt(3).toString()));
+        pstmt.setString(3,addressInfo.elementAt(2).toString());
+        pstmt.setString(4,addressInfo.elementAt(4).toString());
+        pstmt.setString(5,addressInfo.elementAt(1).toString());
+        pstmt.setInt(6, (int)userInfo.elementAt(3));
+
+        System.out.println("pstmt: "   + pstmt.toString());
+        System.out.println("About to Execute UPDATE PERSONS ADDRESS!!!!!!");
+        pstmt.execute();
+//-------------------------------------------------------------------------------------------------------------------------------
+    pstmt.close();
+    System.out.println("LEAVING");
+    JOptionPane.showMessageDialog(null, "hey kid it looks like newly created user went through, thats great...", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
+  }//end of try
+  catch(SQLException ex) 
+  {
+    System.out.println(ex.getMessage());
+    JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
+  }
+  catch (NumberFormatException nfe)
+  {
+    JOptionPane.showMessageDialog(this,"Please make sure data in either the zip field or the quotaField is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
+  }
+}// END OF updateUserQueryExecuter 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void doQuery(String querytodo,String queryString,int count)
 {
   try 
@@ -278,17 +282,14 @@ void doQuery(String querytodo,String queryString,int count)
       return;
     }
     else 
-    {
-      // columnNames holds the column names of the query result      
+    {  
       Vector<Object> columnNames = new Vector<Object>(); 
-      // rows is a vector of vectors, each vector is a vector of
-      // values representing a certain row of the query result
-      Vector<Object> rows = new Vector<Object>();
-      // get column headers
-      doQuerymetaData = doQueryresultSet.getMetaData();
+      Vector<Object> rows        = new Vector<Object>();
+      doQuerymetaData            = doQueryresultSet.getMetaData();
+
       for(int i = 1; i <= doQuerymetaData.getColumnCount(); ++i)
          columnNames.addElement(doQuerymetaData.getColumnLabel(i));
-      // get row data
+
       do 
       {
          Vector<Object> currentRow = new Vector<Object>();
@@ -296,13 +297,12 @@ void doQuery(String querytodo,String queryString,int count)
             currentRow.addElement(doQueryresultSet.getObject(i));
          rows.addElement(currentRow);
       } 
-      while(doQueryresultSet.next()); //moves cursor to next record
+      while(doQueryresultSet.next());
             
       if(scroller!=null)
          getContentPane().remove(scroller);
 
-      // display table with ResultSet contents
-      table = new JTable(rows, columnNames);
+      table    = new JTable(rows, columnNames);
       table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), 10*table.getRowHeight()));
       scroller = new JScrollPane(table);
       getContentPane().add(scroller,BorderLayout.SOUTH);
@@ -314,5 +314,6 @@ void doQuery(String querytodo,String queryString,int count)
   {
    JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
   }
-}// END OF DO QUERY 
+}// END OF DO QUERY
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }//END OF CLASS
