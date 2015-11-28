@@ -135,12 +135,12 @@ public void actionPerformed(ActionEvent e)
       }
       catch (NumberFormatException nfe)
       {
-        JOptionPane.showMessageDialog(this,"Please make sure data in either the zip field or the quotaField is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this,"Please make sure that the data in either the zip field or the quota Field is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
       }
     }
     else
     {
-      JOptionPane.showMessageDialog(this,"Please make sure data is entered in every Field.","RIP.",JOptionPane.WARNING_MESSAGE);
+      JOptionPane.showMessageDialog(this,"Please enter data in every Text Field.","RIP.",JOptionPane.WARNING_MESSAGE);
     }
   }
 }//end of action performed
@@ -168,12 +168,13 @@ void createUserQueryExecuter()
 
 //-------------------------------------------------------------------------------------------------------------------------------
     // Inserts the Newly Created person into the persons table with a new pid and the username provided
-    pstmt       = connection.prepareStatement(" INSERT INTO Person(pid, pname) VALUES (?, ?);");
+    pstmt = connection.prepareStatement(" INSERT INTO Person(pid, pname) VALUES (?, ?);");
     pstmt.setInt(1,maxPid);
     pstmt.setString(2, userNameField.getText().trim());//pname
     System.out.println("userNameField "+userNameField.getText().trim());
     System.out.println("pstmt: " +pstmt.toString());
-    System.out.println("About to Execute");
+    System.out.println("About to INSERT INTO Person(table lol)");
+    System.out.println("");
     pstmt.execute();
 //-------------------------------------------------------------------------------------------------------------------------------
     // Inserts the Newly Created user into the persons table
@@ -184,7 +185,8 @@ void createUserQueryExecuter()
     pstmt.setInt(3, Integer.parseInt(quotaField.getText().trim()));//rental_quota
     pstmt.setString(4, new String(pwdField.getPassword()));//user_password
     System.out.println("pstmt: " +pstmt.toString());
-    System.out.println("About to Execute");
+    System.out.println("About to INSERT INTO User");
+    System.out.println("");
     pstmt.execute();
 //-------------------------------------------------------------------------------------------------------------------------------
     // And here's where id keep my Addresses, IF I HAD ANYYY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -197,7 +199,8 @@ void createUserQueryExecuter()
     pstmt.setString(4, stateField.getText().trim());// sets state
     pstmt.setString(5, cityField.getText().trim());//sets city
     System.out.println("pstmt: " + pstmt.toString());
-    System.out.println("About to Execute");
+    System.out.println("About to INSERT IGNORE address");
+    System.out.println("");
     pstmt.execute();
 //-------------------------------------------------------------------------------------------------------------------------------
     //Sets up the users has_address field so that we can know where to connect the addresses to the peoples then we can ship their rentals! 
@@ -207,7 +210,8 @@ void createUserQueryExecuter()
     pstmt.setString(2, addressField.getText().trim());//sets address
     pstmt.setInt(3, Integer.parseInt(zipField.getText().trim()));// sets zipcode int
     System.out.println("pstmt: " + pstmt.toString());
-    System.out.println("About to Execute");
+    System.out.println("About to INSERT has_address");
+    System.out.println("");
     pstmt.execute();
 //-------------------------------------------------------------------------------------------------------------------------------
     pstmt.close();
@@ -216,6 +220,7 @@ void createUserQueryExecuter()
   }//end of try
   catch(SQLException ex) 
   {
+    System.out.println("");
     System.out.println(ex.getMessage());
     JOptionPane.showMessageDialog(null, ex.getMessage(), "Query error!", JOptionPane.ERROR_MESSAGE);
   }

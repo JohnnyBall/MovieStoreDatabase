@@ -9,7 +9,6 @@ public class UserInfoDialog extends JDialog implements ActionListener
 {
    private Vector<Object>    userInfo;
    private Vector<Object>    addressInfo;
-   //private Vector<Object>    editInfo;
 
    public  JButton           refreshButton;
    public  JButton           editButton;
@@ -91,8 +90,6 @@ public class UserInfoDialog extends JDialog implements ActionListener
 
       topPanel.setLayout(new GridLayout(18,2,0,5));
 
-
-//THIS SHOULD BE A METHOD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
       pstmt = connection.prepareStatement(dbhandler.personNameSearch);
       System.out.println("running this Query:"+dbhandler.personNameSearch);
       pstmt.clearParameters();
@@ -184,7 +181,6 @@ public class UserInfoDialog extends JDialog implements ActionListener
     setVisible(true);
   }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 public void actionPerformed(ActionEvent e)
 {  
   if(e.getActionCommand().equals("REFRESH"))
@@ -251,7 +247,7 @@ void updateUserQueryExecuter()
 //-------------------------------------------------------------------------------------------------------------------------------
     pstmt.close();
     System.out.println("LEAVING");
-    JOptionPane.showMessageDialog(null, "hey kid it looks like newly created user went through, thats great...", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
+    JOptionPane.showMessageDialog(null, "hey kid it looks like the user was created correctly, thats great...", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
   }//end of try
   catch(SQLException ex) 
   {
@@ -275,7 +271,6 @@ void doQuery(String querytodo,String queryString,int count)
 
     doQueryresultSet = pstmt.executeQuery();
     System.out.println("About to Execute");
-    //If there are no records, display a message
     if(!doQueryresultSet.next()) 
     {
       JOptionPane.showMessageDialog(null,"No records found!");

@@ -1,4 +1,3 @@
-// This program displays the results of a query on a database
 import java.sql.*;
 import javax.swing.*;
 import java.awt.*;

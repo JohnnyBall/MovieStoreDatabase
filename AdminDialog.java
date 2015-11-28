@@ -8,33 +8,34 @@ import java.util.*;
 public class AdminDialog extends JDialog
                                  implements ActionListener
 {
-   private JButton            createButton;
-   private JButton            deleteButton;
-   private JButton            displayButton;
-   private JButton            returnButton;
+   private JButton             createButton;
+   private JButton             deleteButton;
+   private JButton             displayButton;
+   private JButton             returnButton;
    
-   private JRadioButton       userButton;
-   private JRadioButton       rentalButton;
-   private JRadioButton       rentalOutButton;
-   private JRadioButton       topTenButton;
-   private JRadioButton       last24hrsButton;
+   private JRadioButton        userButton;
+   private JRadioButton        rentalButton;
+   private JRadioButton        rentalOutButton;
+   private JRadioButton        topTenButton;
+   private JRadioButton        last24hrsButton;
 
-   private ButtonGroup        adminButtonGroup;
+   private ButtonGroup         adminButtonGroup;
 
-   private JPanel             topPanel;
-   private JPanel             buttonPanel;
-   private JPanel             radiobuttonSelectionPanel;
-   private JPanel             buttonSelectionPanel;
-   private JTable             table;
-   private JScrollPane        scroller;
-   private CreateUserDialog   createuserdialog;   
-   private CreateRentalDialog createrentaldialog;
+   private JPanel              topPanel;
+   private JPanel              buttonPanel;
+   private JPanel              radiobuttonSelectionPanel;
+   private JPanel              buttonSelectionPanel;
+   private JTable              table;
+   private JScrollPane         scroller;
+   private CreateUserDialog    createuserdialog;   
+   private CreateRentalDialog  createrentaldialog;
 
    private ResultSet           resultSet;
    private ResultSetMetaData   metaData;
    private PreparedStatement   pstmt;
    private Statement           statement;
    private Connection          connection;
+
    public AdminDialog(Connection newConnection)
    {
       setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -137,13 +138,11 @@ public void actionPerformed(ActionEvent e)
    }
    else if(e.getActionCommand().equals("DISPLAY") && rentalOutButton.isSelected())
    {
-      System.out.println("Display rentalOutButton");
       tmp = "SELECT * FROM rentals_record_rents rrr Where rrr.return_Date is null ;";
       this.doQuery(tmp);
    }
    else if(e.getActionCommand().equals("DISPLAY") && topTenButton.isSelected())
    {
-      System.out.println("ATTEMPTING TOPTEN");
       tmp = " SELECT rrr.rid,r.title FROM rentals_record_rents rrr, rentals r" 
           + " WHERE (rrr.from_date between (CURDATE() - INTERVAL 30 DAY) AND CURDATE())"
           + " AND rrr.rid = r.rid GROUP BY rrr.rid ORDER BY count(*) desc LIMIT 10;";
@@ -151,7 +150,6 @@ public void actionPerformed(ActionEvent e)
    }
    else if(e.getActionCommand().equals("DISPLAY") && last24hrsButton.isSelected())
    {
-      System.out.println("ATTEMPTING HOURS");
       tmp = " SELECT DISTINCT r.rid, r.title, rrr.trackingnum, a.street, a.city, a.state, a.zip,a.phone, rrr.from_date"
           + " FROM rentals_record_rents rrr, rentals r, user u, person p, address a, has_address ha "
           + " WHERE rrr.from_date between (now() - INTERVAL 1 DAY) AND NOW() " 
@@ -161,16 +159,13 @@ public void actionPerformed(ActionEvent e)
    else if(e.getActionCommand().equals("CREATE") && userButton.isSelected())
    {
       createuserdialog = new CreateUserDialog(connection,true);
-      System.out.println("CreateUserDialog");
    }      
    else if(e.getActionCommand().equals("CREATE") && rentalButton.isSelected())
    {
       createrentaldialog = new CreateRentalDialog(connection);
-      System.out.println("CreateRentalDialog");
    }
    else if(e.getActionCommand().equals("DELETE"))
    {
-      System.out.println("DELETEUser");
       if(table.getSelectedRow() == -1)
        JOptionPane.showMessageDialog(null,"Nothing seems to be selected!");
       else
@@ -178,7 +173,6 @@ public void actionPerformed(ActionEvent e)
    }
    else if(e.getActionCommand().equals("RETURN"))
    {
-      System.out.println("RETURN RID");
       if(table.getSelectedRow() == -1)
        JOptionPane.showMessageDialog(null,"Nothing seems to be selected!");
       else
@@ -195,7 +189,6 @@ void buttonUpdater()
     if(userButton.isSelected()||rentalButton.isSelected())
       createButton.setEnabled(true);
 }        
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void doQuery(String query)
 {
@@ -271,7 +264,7 @@ void deleteQueryExecuter(int idToDelete)
     pstmt.execute();
 
     System.out.println("hey kid it looks like you deleted the thing, thats great...");
-    JOptionPane.showMessageDialog(null, "The item you selected has been entered into the database!", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
+    JOptionPane.showMessageDialog(null, "The item you selected has been DELETED from the database!", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
     displayButton.doClick();
     pstmt.close();
     System.out.println("DONE!");

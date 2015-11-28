@@ -145,10 +145,12 @@ public class DatabaseGui extends JFrame
 
       gamesOrMoviesButtonGroup.add(moviesButton);
       gamesOrMoviesButtonGroup.add(gamesButton);
+
       gamesOrMoviesPanel.add(gamesButton);
       gamesOrMoviesPanel.add(moviesButton);
       gamesOrMoviesPanel.add(dontShowRentedBeforeButton);
       gamesOrMoviesPanel.setBorder(BorderFactory.createTitledBorder("Rental Options"));
+
       radioButtonPanel.add(gamesOrMoviesPanel);
 
       moviesButton.setActionCommand("MOVIES");
@@ -171,11 +173,9 @@ public class DatabaseGui extends JFrame
       queryPanel.add(radioButtonPanel,BorderLayout.SOUTH);
       add(queryPanel,BorderLayout.CENTER);
       
-      dbHandler = new DBHandler();
-
-
       this.setupMainFrame();
-      WindowHandler window  = new WindowHandler();
+      dbHandler            = new DBHandler();
+      WindowHandler window = new WindowHandler();
       this.addWindowListener(window);
    }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -446,7 +446,6 @@ public void actionPerformed(ActionEvent e)
        {
        ridHolder = (int)table.getValueAt(table.getSelectedRow(), 0);
        query = dbHandler.sequelSearch;
-       //query = "CREATE OR REPLACE view  search as  "+  dbHandler.sequelSearch + ';';
        System.out.println(query + " " + ridHolder);
        try
        {
@@ -481,7 +480,6 @@ public void actionPerformed(ActionEvent e)
                 JOptionPane.showMessageDialog(null,"No records found!");
                 return;
             }
-       
             else
             {
                 Vector<Object> columnNames = new Vector<Object>();
@@ -607,10 +605,9 @@ public void actionPerformed(ActionEvent e)
            pstmt.setInt(2, (int)userData.elementAt(0));
            pstmt.setInt(3, maxTrackingNumber);
            System.out.println("pstmt: " + pstmt.toString());
-           System.out.println("About to Execute UPDATE on rentals_record_rents RENTING UR THING");
+           System.out.println("About to UPDATE on rentals_record_rents RENTING UR THING");
            pstmt.execute();
-           JOptionPane.showMessageDialog(null, "The rental you selected has been returned, please refresh your table to see results!", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
-           //JOptionPane.showMessageDialog(null, "hey kid it looks like newly created user went through, thats great...", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
+           JOptionPane.showMessageDialog(null, "The rental you selected has been returned!", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
            pstmt.close();
            System.out.println("DONE!");
           }
@@ -723,16 +720,12 @@ void doQuery(String querytodo,String searchFieldText,int count)
     }
     else 
     {
-      // columnNames holds the column names of the query result      
+ 
       Vector<Object> columnNames = new Vector<Object>(); 
-      // rows is a vector of vectors, each vector is a vector of
-      // values representing a certain row of the query result
-      Vector<Object> rows = new Vector<Object>();
-      // get column headers
-      doQuerymetaData = doQueryresultSet.getMetaData();
+      Vector<Object> rows        = new Vector<Object>();
+      doQuerymetaData            = doQueryresultSet.getMetaData();
       for(int i = 1; i <= doQuerymetaData.getColumnCount(); ++i)
          columnNames.addElement(doQuerymetaData.getColumnLabel(i));
-      // get row data
       do 
       {
          Vector<Object> currentRow = new Vector<Object>();
@@ -740,12 +733,11 @@ void doQuery(String querytodo,String searchFieldText,int count)
             currentRow.addElement(doQueryresultSet.getObject(i));
          rows.addElement(currentRow);
       } 
-      while(doQueryresultSet.next()); //moves cursor to next record
+      while(doQueryresultSet.next()); 
             
       if(scroller!=null)
          getContentPane().remove(scroller);
 
-      // display table with ResultSet contents
       sequelButton.setEnabled(false);
       displayAwardsButton.setEnabled(false);
       rentButton.setEnabled(false); 
@@ -785,24 +777,18 @@ void doQuery(String query)
   {
     statement = connection.createStatement();
     resultSet = statement.executeQuery(query);
-    //If there are no records, display a message
     if(!resultSet.next()) 
     {
       JOptionPane.showMessageDialog(null,"No records found!");
       return;
     }
     else 
-    {
-      // columnNames holds the column names of the query result      
+    {  
       Vector<Object> columnNames = new Vector<Object>(); 
-      // rows is a vector of vectors, each vector is a vector of
-      // values representing a certain row of the query result
       Vector<Object> rows = new Vector<Object>();
-      // get column headers
       metaData = resultSet.getMetaData();
       for(int i = 1; i <= metaData.getColumnCount(); ++i)
          columnNames.addElement(metaData.getColumnLabel(i));
-      // get row data
       do 
       {
          Vector<Object> currentRow = new Vector<Object>();
@@ -810,12 +796,9 @@ void doQuery(String query)
             currentRow.addElement(resultSet.getObject(i));
          rows.addElement(currentRow);
       } 
-      while(resultSet.next()); //moves cursor to next record
-            
+      while(resultSet.next()); 
       if(scroller!=null)
          getContentPane().remove(scroller);
-
-      // display table with ResultSet contents
       sequelButton.setEnabled(false);
       displayAwardsButton.setEnabled(false);
       rentButton.setEnabled(false);  

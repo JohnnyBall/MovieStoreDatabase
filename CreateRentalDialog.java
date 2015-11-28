@@ -88,13 +88,13 @@ public class CreateRentalDialog extends JDialog
       getRootPane().setDefaultButton(submitButton);
       
       
-      titleLabel       = new JLabel("Title:");
-      amountLabel      = new JLabel("Number of Available Copy's:");
+      titleLabel       = new JLabel("Title(*):");
+      amountLabel      = new JLabel("Number of Available Copy's(*):");
       releaseDateLabel = new JLabel("ReleaseDate(yyyy-mm-dd): ");
-      genreLabel       = new JLabel("Genre: ");
-      platformLabel    = new JLabel("Platform: ");
-      castMemberLabel  = new JLabel("CastMember(PID): ");
-      directorLabel    = new JLabel("Director(PID): ");
+      genreLabel       = new JLabel("Genre(*): ");
+      platformLabel    = new JLabel("Platform(*): ");
+      castMemberLabel  = new JLabel("CastMember(PID)(*): ");
+      directorLabel    = new JLabel("Director(PID)(*): ");
       sequelLabel      = new JLabel("Sequal(RID): ");
       awardsLabel      = new JLabel("Awards Won: ");
       
@@ -177,7 +177,7 @@ public void actionPerformed(ActionEvent e)
       }
       catch (NumberFormatException nfe)
       {
-        JOptionPane.showMessageDialog(this,"Please make sure data in either the amount field is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this,"Please make sure data in either the # of available copy's field is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
       }
     }
     else if(moviesButton.isSelected() && !(titleField.getText().trim().equals("")) && !(amountField.getText().trim().equals(""))  && !(genreField.getText().trim().equals("")) && !(directorField.getText().trim().equals("") && !(castMemberField.getText().trim().equals(""))))
@@ -189,12 +189,12 @@ public void actionPerformed(ActionEvent e)
       }
       catch (NumberFormatException nfe)
       {
-        JOptionPane.showMessageDialog(this,"Please make sure data in either theamount field  is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this,"Please make sure data in either the # of available copy's field is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
       }
     }
     else
     {
-      JOptionPane.showMessageDialog(this,"Please make sure data is entered in every Title, Amount, releaseDate.","RIP.",JOptionPane.WARNING_MESSAGE);
+      JOptionPane.showMessageDialog(this,"Please make sure data is entered in the required fields, see (*)!","RIP.",JOptionPane.WARNING_MESSAGE);
     }
       //Values in editInfo should be ready to send in a transaction to update userInfo
   }
@@ -226,7 +226,7 @@ void createRentalQueryExecuter()
   try 
   {
 //-------------------------------------------------------------------------------------------------------------------------------
-    // Retrieves the max pid from the Person table, then sets our max pid to it + 1 for use later on. 
+    // Retrieves the max rid from the rental table, then sets our max rid to it + 1 for use later on. 
     statement = connection.createStatement();
     resultSet = statement.executeQuery("SELECT MAX(RID) FROM Rentals");
     System.out.println("statement: " + statement.toString());
@@ -236,25 +236,22 @@ void createRentalQueryExecuter()
       return;
     }
     else
-    {
-     maxRID = resultSet.getInt(1) + 1;
-    }
+      maxRID = resultSet.getInt(1) + 1;
     statement.close();
-
 //-------------------------------------------------------------------------------------------------------------------------------
-    //
-    //pstmt = connection.prepareStatement("INSERT rentals (rid,title,releaseDate,num_availible_copys) VALUES (?, ?, ?, ?);");////////////////////////////////////////FIX 
-    pstmt = connection.prepareStatement("INSERT rentals (rid, title, releaseDate, num_availible_copys) VALUES (?, ?, ?, ?);");////////////////////////////////////////FIX
+    //This section will insert into the rentals table, a rental with a new RID found from the max rid
+    // the rest of the data will be taken from the text fields and inserted as well.
+    pstmt = connection.prepareStatement("INSERT rentals (rid, title, releaseDate, num_availible_copys) VALUES (?, ?, ?, ?);");
     pstmt.setInt(1,maxRID);
     pstmt.setString(2, titleField.getText().trim());//pname
-    pstmt.setDate(3, new java.sql.Date(datemodel.getDate().getTime()));///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    pstmt.setDate(3, new java.sql.Date(datemodel.getDate().getTime()));
     pstmt.setInt(4, Integer.parseInt(amountField.getText().trim()));// sets amountField  of available copys int
     System.out.println("titleField "+ titleField.getText().trim());
     System.out.println("pstmt: " + pstmt.toString());
     System.out.println("About to Execute RENTAL INSERT");
     pstmt.execute();
 //-------------------------------------------------------------------------------------------------------------------------------
-    // 
+    //This section will insert into the belongs_to_genre table, it will contain the user specified genre and RID from the max rid. 
     pstmt.clearParameters();
     pstmt = connection.prepareStatement("INSERT belongs_to_genre(gName, rid)  VALUES(?, ?);");
     pstmt.setString(1, genreField.getText().trim());//Sets the Genre name from the text field
@@ -263,9 +260,10 @@ void createRentalQueryExecuter()
     System.out.println("About to Execute GENRE INSERT");
     pstmt.execute();
 //-------------------------------------------------------------------------------------------------------------------------------
+    // here we check to see if the specified rental is a movie or a game, if its a game we will disable movie specific textfields, game specific textfields will be disabled if its a movie.
     if(moviesButton.isSelected())
     {
-       // 
+       //This section will make an insert into the movie table, using the provided values from the textfields. 
         pstmt.clearParameters();
         pstmt = connection.prepareStatement("INSERT movie (rid, pid, rid_of_prequel) VALUES (?, ?, ?);");
         pstmt.setInt(1,maxRID);
@@ -280,52 +278,54 @@ void createRentalQueryExecuter()
         System.out.println("About to Execute INSERT movie");
         pstmt.execute();
 //-------------------------------------------------------------------------------------------------------------------------------
-       // AND HERES WHERE  I WOULD PUT MY CAST MEMBERS, IF I HAD ANY!!!!!!!!!!!!!!!!!!!!!! 
-        //if(!castMemberField.getText().trim().equals(""))// checks to see if castMemberField is blank
-        //{
+       // AND HERES WHERE  I WOULD PUT MY CAST MEMBERS, IF I HAD ANY!!!!!!!!!!!!!!!!!!!!!!
+       // Just kidding we have cast members now, they can be added or deleted at will for the specified movie. 
+        // currently only allows one cast member insert at a time. 
           pstmt.clearParameters();
           pstmt = connection.prepareStatement("INSERT was_in(pid,rid) VALUES (?, ?);");
-          pstmt.setInt(1, Integer.parseInt(castMemberField.getText().trim()));///////////////////////////////////////MAY NEED TO PARSE AND STRING/loop and choop
+          pstmt.setInt(1, Integer.parseInt(castMemberField.getText().trim()));
           pstmt.setInt(2,maxRID);
           System.out.println("pstmt: " + pstmt.toString());
-          System.out.println("About to ExecuteINSERT movie");
+          System.out.println("About to INSERT INTO  was_in");
           pstmt.execute();
-      // }
 //-------------------------------------------------------------------------------------------------------------------------------
-        //
+        //checks to see if the awards text field is blank, if it is we will not run this query,
+        // otherwise this query will insert the specified award title into the has_won_award table,
+        // currently only allows one award insertion at a time.
         if(!awardsField.getText().trim().equals(""))// checks to see if award textfield is blank
         {
           pstmt.clearParameters();
           pstmt = connection.prepareStatement("INSERT has_won_award(rid, aTitle) VALUES (?, ?);");
           pstmt.setInt(1, maxRID);// Sets pid for new person value
-          pstmt.setString(2, awardsField.getText().trim());//sets award/////////////////////////////////////MAY NEED TO PARSE AND STRING/loop and choop
+          pstmt.setString(2, awardsField.getText().trim());
           System.out.println("pstmt: " + pstmt.toString());
           System.out.println("About to Execute INSERT has_won_award");
           pstmt.execute();
         }
-//-------------------------------------------------------------------------------------------------------------------------------
     }
+//-------------------------------------------------------------------------------------------------------------------------------
     else if(gamesButton.isSelected())
     {    
-       // 
+       //This section will make an insert into the game table, it will simply insert the specified rid from the data found earlier. 
         pstmt.clearParameters();
         pstmt = connection.prepareStatement("INSERT game (rid) VALUE (?);");
         pstmt.setInt(1,maxRID);
         System.out.println("pstmt: " + pstmt.toString());
-        System.out.println("About to Execute INSERT movie");
+        System.out.println("About to  INSERT game");
         pstmt.execute();
 //-------------------------------------------------------------------------------------------------------------------------------
-      // 
+      // This Section will insert the specified platform the game runs on  into the plays_on_platform table
+      // currently only allows one platform insert at a time.   
         pstmt.clearParameters();
         pstmt = connection.prepareStatement("INSERT plays_on_platform (rid, platName) VALUE (?, ?);");
         pstmt.setInt(1,maxRID);
-        pstmt.setString(2, platFormField.getText().trim());//sets platform/////////////////////////////////////MAY NEED TO PARSE AND STRING/loop and choop
+        pstmt.setString(2, platFormField.getText().trim());
         System.out.println("pstmt: " + pstmt.toString());
-        System.out.println("About to Execute INSERT movie");
+        System.out.println("About to  INSERT INTO plays_on_platform");
         pstmt.execute();
     }
     pstmt.close();
-    System.out.println("LEAVING");
+    System.out.println("LEAVING createRentalQueryExecuter");
     JOptionPane.showMessageDialog(null, "Your rental has been entered into the database, please refresh your table to see results!", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
   }//end of try
   catch(SQLException ex) 
@@ -338,5 +338,4 @@ void createRentalQueryExecuter()
     JOptionPane.showMessageDialog(this,"Please make sure data in either the zip field or the quotaField is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
   }
 }// END OF createRentalQueryExecuter
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }//END OF CLASS
