@@ -177,7 +177,7 @@ public void actionPerformed(ActionEvent e)
       }
       catch (NumberFormatException nfe)
       {
-        JOptionPane.showMessageDialog(this,"Please make sure data in either the zip field or the quotaField is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this,"Please make sure data in either the amount field is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
       }
     }
     else if(moviesButton.isSelected() && !(titleField.getText().trim().equals("")) && !(amountField.getText().trim().equals(""))  && !(genreField.getText().trim().equals("")) && !(directorField.getText().trim().equals("") && !(castMemberField.getText().trim().equals(""))))
@@ -189,7 +189,7 @@ public void actionPerformed(ActionEvent e)
       }
       catch (NumberFormatException nfe)
       {
-        JOptionPane.showMessageDialog(this,"Please make sure data in either the zip field or the quotaField is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this,"Please make sure data in either theamount field  is an integer!","RIP.",JOptionPane.WARNING_MESSAGE);
       }
     }
     else

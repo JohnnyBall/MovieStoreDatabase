@@ -226,9 +226,6 @@ void doQuery(String query)
       if(scroller!=null)
          getContentPane().remove(scroller);
 
-      createButton.setEnabled(false);
-      deleteButton.setEnabled(false);
-      returnButton.setEnabled(false);
       table = new JTable(rows, columnNames);
       table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
       {
@@ -274,7 +271,8 @@ void deleteQueryExecuter(int idToDelete)
     pstmt.execute();
 
     System.out.println("hey kid it looks like you deleted the thing, thats great...");
-    JOptionPane.showMessageDialog(null, "The item you selected has been entered into the database, please refresh your table to see results!", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
+    JOptionPane.showMessageDialog(null, "The item you selected has been entered into the database!", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
+    displayButton.doClick();
     pstmt.close();
     System.out.println("DONE!");
   }//end of try
@@ -295,8 +293,8 @@ void returnQueryExecuter(int trackingNumber)
     System.out.println("pstmt: " + pstmt.toString());
     System.out.println("About to Execute UPDATE on rentals_record_rents");
     pstmt.execute();
-    JOptionPane.showMessageDialog(null, "The rental you selected has been returned, please refresh your table to see results!", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
-    //JOptionPane.showMessageDialog(null, "hey kid it looks like newly created user went through, thats great...", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
+    JOptionPane.showMessageDialog(null, "The rental you selected has been returned!", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
+    displayButton.doClick();
     pstmt.close();
     System.out.println("DONE!");
   }//end of try
