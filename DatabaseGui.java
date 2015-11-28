@@ -607,7 +607,7 @@ public void actionPerformed(ActionEvent e)
            System.out.println("pstmt: " + pstmt.toString());
            System.out.println("About to UPDATE on rentals_record_rents RENTING UR THING");
            pstmt.execute();
-           JOptionPane.showMessageDialog(null, "The rental you selected has been returned!", "Well thats pretty neat!", JOptionPane.INFORMATION_MESSAGE);
+           JOptionPane.showMessageDialog(null, "The rental you selected has went through, we will ship it to you shortly!", "Enjoy!", JOptionPane.INFORMATION_MESSAGE);
            pstmt.close();
            System.out.println("DONE!");
           }
