@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.awt.List;
 public class CreateRentalDialog extends JDialog
                                  implements ActionListener
 {
@@ -90,20 +91,20 @@ public class CreateRentalDialog extends JDialog
       
       titleLabel       = new JLabel("Title(*):");
       amountLabel      = new JLabel("Number of Available Copy's(*):");
-      releaseDateLabel = new JLabel("ReleaseDate(yyyy-mm-dd): ");
-      genreLabel       = new JLabel("Genre(*): ");
-      platformLabel    = new JLabel("Platform(*): ");
-      castMemberLabel  = new JLabel("CastMember(PID)(*): ");
-      directorLabel    = new JLabel("Director(PID)(*): ");
-      sequelLabel      = new JLabel("Sequal(RID): ");
-      awardsLabel      = new JLabel("Awards Won: ");
+      releaseDateLabel = new JLabel("ReleaseDate(yyyy-mm-dd):");
+      genreLabel       = new JLabel("Genre(*):");
+      platformLabel    = new JLabel("Platform(*):");
+      castMemberLabel  = new JLabel("CastMember(PID)(*)(comma separators):");
+      directorLabel    = new JLabel("Director(PID)(*):");
+      sequelLabel      = new JLabel("Sequal(RID):");
+      awardsLabel      = new JLabel("Awards Won(comma separators):");
       
       titleField       = new JTextField();
       amountField      = new JTextField();
       genreField       = new JTextField();
       platFormField    = new JTextField();
       directorField    = new JTextField();
-      castMemberField  = new JTextField("this will only add one member as of now...");
+      castMemberField  = new JTextField();
       prequelField     = new JTextField();
       awardsField      = new JTextField();
 
@@ -222,7 +223,9 @@ void fieldUpdater()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void createRentalQueryExecuter()
 {
-  int maxRID = 0;
+  int                  maxRID = 0;
+  String               castORAwardString;
+  String[]             castORAwardList;
   try 
   {
 //-------------------------------------------------------------------------------------------------------------------------------
@@ -280,27 +283,38 @@ void createRentalQueryExecuter()
 //-------------------------------------------------------------------------------------------------------------------------------
        // AND HERES WHERE  I WOULD PUT MY CAST MEMBERS, IF I HAD ANY!!!!!!!!!!!!!!!!!!!!!!
        // Just kidding we have cast members now, they can be added or deleted at will for the specified movie. 
-        // currently only allows one cast member insert at a time. 
-          pstmt.clearParameters();
-          pstmt = connection.prepareStatement("INSERT was_in(pid,rid) VALUES (?, ?);");
-          pstmt.setInt(1, Integer.parseInt(castMemberField.getText().trim()));
-          pstmt.setInt(2,maxRID);
-          System.out.println("pstmt: " + pstmt.toString());
-          System.out.println("About to INSERT INTO  was_in");
-          pstmt.execute();
+        // currently only allows one cast member insert at a time.
+
+          castORAwardString   = castMemberField.getText().trim();
+          castORAwardList     = castORAwardString.split(",");
+          for(int i = 0; i < castORAwardList.length; i++)
+          {
+            pstmt.clearParameters();
+            pstmt = connection.prepareStatement("INSERT was_in(pid,rid) VALUES (?, ?);");
+            pstmt.setInt(1, Integer.parseInt(castORAwardList[i]));
+            pstmt.setInt(2,maxRID);
+            System.out.println("pstmt: " + pstmt.toString());
+            System.out.println("About to INSERT INTO  was_in");
+            pstmt.execute();
+          }
 //-------------------------------------------------------------------------------------------------------------------------------
         //checks to see if the awards text field is blank, if it is we will not run this query,
         // otherwise this query will insert the specified award title into the has_won_award table,
         // currently only allows one award insertion at a time.
         if(!awardsField.getText().trim().equals(""))// checks to see if award textfield is blank
         {
-          pstmt.clearParameters();
-          pstmt = connection.prepareStatement("INSERT has_won_award(rid, aTitle) VALUES (?, ?);");
-          pstmt.setInt(1, maxRID);// Sets pid for new person value
-          pstmt.setString(2, awardsField.getText().trim());
-          System.out.println("pstmt: " + pstmt.toString());
-          System.out.println("About to Execute INSERT has_won_award");
-          pstmt.execute();
+          castORAwardString   = awardsField.getText().trim();
+          castORAwardList     = castORAwardString.split(",");
+          for(int i = 0; i < castORAwardList.length; i++)
+          {
+            pstmt.clearParameters();
+            pstmt = connection.prepareStatement("INSERT has_won_award(rid, aTitle) VALUES (?, ?);");
+            pstmt.setInt(1, maxRID);// Sets pid for new person value
+            pstmt.setString(2, castORAwardList[i]);
+            System.out.println("pstmt: " + pstmt.toString());
+            System.out.println("About to Execute INSERT has_won_award");
+            pstmt.execute();
+          }
         }
     }
 //-------------------------------------------------------------------------------------------------------------------------------
