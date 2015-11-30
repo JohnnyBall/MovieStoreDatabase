@@ -13,6 +13,8 @@ public class AdminDialog extends JDialog
    private JButton             displayButton;
    private JButton             returnButton;
    
+   private JRadioButton        castButton;
+   private JRadioButton        directorButton;
    private JRadioButton        userButton;
    private JRadioButton        rentalButton;
    private JRadioButton        rentalOutButton;
@@ -67,6 +69,12 @@ public class AdminDialog extends JDialog
       returnButton.addActionListener(this);
       buttonSelectionPanel.add(returnButton);
       
+      castButton       = new JRadioButton("Cast");
+      castButton.setActionCommand("CAST");
+      castButton.addActionListener(this);
+      directorButton   = new JRadioButton("Director");
+      directorButton.setActionCommand("DIRECTOR");
+      directorButton.addActionListener(this);
       userButton       = new JRadioButton("Members");
       userButton.setActionCommand("USER");
       userButton.addActionListener(this);
@@ -84,12 +92,16 @@ public class AdminDialog extends JDialog
       last24hrsButton.addActionListener(this);
       adminButtonGroup = new ButtonGroup();
 
+      adminButtonGroup.add(castButton);
+      adminButtonGroup.add(directorButton);
       adminButtonGroup.add(userButton);
       adminButtonGroup.add(rentalButton);
       adminButtonGroup.add(rentalOutButton);
       adminButtonGroup.add(topTenButton);
       adminButtonGroup.add(last24hrsButton);
 
+      radiobuttonSelectionPanel.add(castButton);
+      radiobuttonSelectionPanel.add(directorButton);
       radiobuttonSelectionPanel.add(userButton);
       radiobuttonSelectionPanel.add(rentalButton);
       radiobuttonSelectionPanel.add(rentalOutButton);
@@ -122,13 +134,23 @@ public class AdminDialog extends JDialog
 public void actionPerformed(ActionEvent e)
 {  
    String tmp;
-   if((e.getActionCommand().equals("USER"))||(e.getActionCommand().equals("RENTALS"))||(e.getActionCommand().equals("RENTEDOUT"))||(e.getActionCommand().equals("TOPTEN"))||(e.getActionCommand().equals("LAST24")))
+   if((e.getActionCommand().equals("USER"))||(e.getActionCommand().equals("RENTALS"))||(e.getActionCommand().equals("RENTEDOUT"))||(e.getActionCommand().equals("TOPTEN"))||(e.getActionCommand().equals("LAST24"))||(e.getActionCommand().equals("CAST"))||(e.getActionCommand().equals("DIRECTOR")))
    {
       buttonUpdater();
    }
    else if(e.getActionCommand().equals("DISPLAY") && userButton.isSelected())
    {
-      tmp = "SELECT * FROM moviestore.user;";
+      tmp = "SELECT * FROM moviestore.person NATURAL JOIN moviestore.user;";
+      this.doQuery(tmp);
+   }
+   else if(e.getActionCommand().equals("DISPLAY") && castButton.isSelected())
+   {
+      tmp = "SELECT * FROM moviestore.person NATURAL JOIN moviestore.mcast;";
+      this.doQuery(tmp);
+   }
+   else if(e.getActionCommand().equals("DISPLAY") && directorButton.isSelected())
+   {
+      tmp = "SELECT * FROM moviestore.person NATURAL JOIN moviestore.director;";
       this.doQuery(tmp);
    }
    else if(e.getActionCommand().equals("DISPLAY") && rentalButton.isSelected())
